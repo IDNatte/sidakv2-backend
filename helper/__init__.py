@@ -12,7 +12,6 @@ def authentication(f):
       token = token = request.headers['Authorization']
       data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
       current_user = User.query.filter_by(uid=data['carrier']['uid']).first()
-      print(current_user)
 
     except jwt.exceptions.ExpiredSignature as e:
       abort(401, {'authorizationError': 'Token Expired'})

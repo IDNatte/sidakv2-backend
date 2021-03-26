@@ -14,5 +14,7 @@ dist/
 build/
 *.egg-info/
 
+db
 db/
+data
 ./db/*.db

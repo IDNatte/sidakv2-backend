@@ -1,7 +1,7 @@
 from router.api import api_endpoint
 from router import main_page
 
-from flask import Flask, request
+from flask import Flask
 from model import User
 from config import db
 
@@ -18,5 +18,5 @@ with app.app_context():
   db.create_all();
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(debug=True, port=8000)
 

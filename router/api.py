@@ -1,11 +1,12 @@
 from flask import Blueprint, jsonify, request, g, redirect, url_for, abort, current_app
+from model import User, UserFileEntry, dbhelper
 from helper import authentication
-from model import User, FileEntry
 from config import db
 import sqlalchemy
 import platform
 import datetime
 import flask
+import json
 import time
 import jwt
 import os
@@ -19,6 +20,7 @@ def before_request():
 
 
 # error handler API
+@api_endpoint.app_errorhandler(400)
 @api_endpoint.app_errorhandler(401)
 @api_endpoint.app_errorhandler(405)
 @api_endpoint.app_errorhandler(404)
@@ -51,7 +53,7 @@ def authorization():
       passwd_authentication = user_data.check_password(request.get_json()['password'])
 
       if passwd_authentication:
-        token_exp = datetime.datetime.utcnow() + datetime.timedelta(weeks=2)
+        token_exp = datetime.datetime.utcnow() + datetime.timedelta(days=1)
         token = jwt.encode({
           "carrier": {
             "uid": user_data.uid
@@ -71,12 +73,14 @@ def authorization():
 def register():
 
   try:
+    file_directory = './data/json/{0}-{1}.json'.format(dbhelper.UUIDGenerator(), request.get_json()['org'])
     username = request.get_json()['username']
     password = request.get_json()['password']
     email = request.get_json()['email']
     org = request.get_json()['org']
 
     u = User(email=email, username=username, org=org)
+    u.content = [UserFileEntry(fileURL=file_directory)]
     u.set_password(password)
     db.session.add(u)
     db.session.commit()
@@ -112,8 +116,25 @@ def get_me(current_user):
   })
 
 # resource API
-@api_endpoint.route('/api/resource', methods=["GET"])
+@api_endpoint.route('/api/resource', methods=["GET", "POST"])
 @authentication
 def resource(current_user):
-  c = FileEntry.query.filter_by(owner=current_user.uid)
-  return jsonify({'secret': c})
+  if request.method == 'GET':
+    dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
+    try:
+      with open(dyn_fileentry.fileURL, 'r') as data_content:
+        return jsonify(json.loads(data_content.read()))
+    except FileNotFoundError:
+      abort(404, {'EmptyDataEntry': 'your data entry is still empty'})
+
+  elif request.method == 'POST':
+    if request.headers.get('Content-Type') == 'application/json':
+      dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
+      with open(dyn_fileentry.fileURL, 'w') as wdhard:
+        json.dump(request.get_json(), wdhard)
+
+    else:
+      abort(400, {'TypeError': 'You submitted non-json body!'})
+
+
+  return jsonify({'secret': 'c'})
