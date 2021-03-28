@@ -1,11 +1,14 @@
-from flask import Blueprint, jsonify, request, g, redirect, url_for, abort, current_app
-from model import User, UserFileEntry, dbhelper
+"""Rest api endpoint router config"""
+
+from flask import Blueprint, jsonify, request, g, redirect, url_for, abort, current_app, Response
+from model import User, UserFileEntry, GeneralFileEntry, dbhelper
 from helper import authentication
 from config import db
 import sqlalchemy
 import platform
 import datetime
 import flask
+import time
 import json
 import time
 import jwt
@@ -73,7 +76,7 @@ def authorization():
 def register():
 
   try:
-    file_directory = './data/json/{0}-{1}.json'.format(dbhelper.UUIDGenerator(), request.get_json()['org'])
+    file_directory = './data/dynamic/{0}-{1}.json'.format(dbhelper.UUIDGenerator(), request.get_json()['org'])
     username = request.get_json()['username']
     password = request.get_json()['password']
     email = request.get_json()['email']
@@ -116,7 +119,7 @@ def get_me(current_user):
   })
 
 # resource API
-@api_endpoint.route('/api/resource', methods=["GET", "POST"])
+@api_endpoint.route('/api/resource', methods=["GET", "POST", "PATCH", "DELETE"])
 @authentication
 def resource(current_user):
   if request.method == 'GET':
@@ -124,17 +127,85 @@ def resource(current_user):
     try:
       with open(dyn_fileentry.fileURL, 'r') as data_content:
         return jsonify(json.loads(data_content.read()))
+
     except FileNotFoundError:
       abort(404, {'EmptyDataEntry': 'your data entry is still empty'})
 
   elif request.method == 'POST':
     if request.headers.get('Content-Type') == 'application/json':
-      dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
-      with open(dyn_fileentry.fileURL, 'w') as wdhard:
-        json.dump(request.get_json(), wdhard)
+
+      try:
+        dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
+        dyn_gentry = GeneralFileEntry.query.one()
+
+        template = {
+          current_user.uid: {
+            request.get_json()['data_name']: {
+              "data": request.get_json()['data_item'],
+              "meta": [
+                {
+                  "created_on": time.time(),
+                  "collection_id": dbhelper.UUIDGenerator()
+                }
+              ]
+            }
+          },
+        }
+
+        try:
+          with open(dyn_fileentry.fileURL, 'r+') as usr_ent:
+            a = json.load(usr_ent)
+            a.update(template)
+            json.dump(a, usr_ent)
+
+          with open(dyn_gentry.fileUrl, 'r+') as general_ent:
+            a = json.load(general_ent)
+            a.update(template)
+            json.dump(a, general_ent)
+
+        except FileNotFoundError as e:
+          with open(dyn_fileentry.fileURL, 'w') as usr_ent:
+            json.dump(template, usr_ent)
+
+          with open(dyn_gentry.fileUrl, 'w') as general_ent:
+            json.dump(template, general_ent)
+
+        except Exception as e:
+          print(e)
+          abort(500, {'ServerError': "something went wrong"})
+
+        return jsonify({"data_saved": True}), 201
+
+      except KeyError as e:
+        abort(401, {'InvalidRequestBodyError': 'Not sufficient or wrong argument given'})
 
     else:
       abort(400, {'TypeError': 'You submitted non-json body!'})
 
+  elif request.method == 'PATCH':
+    return jsonify({"edited": "true"})
+
+  elif request.method == 'DELETE':
+    return jsonify({"deleted": "true"})
+
 
   return jsonify({'secret': 'c'})
+
+
+@api_endpoint.route('/api/general/resource', methods=["GET"])
+def general_r():
+  d = dyn_gentry = GeneralFileEntry.query.one()
+  with open(d.fileUrl, 'r') as general_res:
+    return jsonify(json.load(general_res))
+
+# remove this on deployment mode
+@api_endpoint.route('/api/init_general')
+def init_general():
+  try:
+    test = GeneralFileEntry()
+    db.session.add(test)
+    db.session.commit()
+    return ({"data_initiated": True})
+  except Exception as e:
+    print(e)
+    abort(500, {'ServerError': "something went wrong"})

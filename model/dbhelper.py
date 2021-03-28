@@ -1,3 +1,5 @@
+"""Database Helper Function"""
+
 import uuid
 
 def UUIDGenerator():

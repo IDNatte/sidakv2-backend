@@ -1,3 +1,5 @@
+"""Common router config"""
+
 from flask import Blueprint, render_template
 import os
 
