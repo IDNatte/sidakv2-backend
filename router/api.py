@@ -138,20 +138,6 @@ def resource(current_user):
         dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
         dyn_gentry = GeneralFileEntry.query.one()
 
-        template = {
-          current_user.uid: {
-            request.get_json()['data_name']: {
-              "data": request.get_json()['data_item'],
-              "meta": [
-                {
-                  "created_on": time.time(),
-                  "collection_id": dbhelper.UUIDGenerator()
-                }
-              ]
-            }
-          },
-        }
-
         try:
           with open(dyn_fileentry.fileURL, 'r+') as usr_ent:
             a = json.load(usr_ent)
@@ -164,6 +150,20 @@ def resource(current_user):
             json.dump(a, general_ent)
 
         except FileNotFoundError as e:
+          template = {
+            current_user.uid: {
+              request.get_json()['data_name']: {
+                "data": request.get_json()['data_item'],
+                "meta": [
+                  {
+                    "created_on": time.time(),
+                    "collection_id": dbhelper.UUIDGenerator()
+                  }
+                ]
+              }
+            }
+          }
+
           with open(dyn_fileentry.fileURL, 'w') as usr_ent:
             json.dump(template, usr_ent)
 
