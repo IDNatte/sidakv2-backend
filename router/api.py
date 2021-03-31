@@ -5,6 +5,7 @@ from model import User, UserFileEntry, GeneralFileEntry, dbhelper
 from helper import authentication
 from config import db
 import sqlalchemy
+import pprint
 import platform
 import datetime
 import flask
@@ -124,6 +125,7 @@ def get_me(current_user):
 def resource(current_user):
   if request.method == 'GET':
     dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
+    
     try:
       with open(dyn_fileentry.fileURL, 'r') as data_content:
         return jsonify(json.loads(data_content.read()))
@@ -138,18 +140,63 @@ def resource(current_user):
         dyn_fileentry = db.session.query(UserFileEntry).join(User).filter(User.uid==current_user.uid).first()
         dyn_gentry = GeneralFileEntry.query.one()
 
-        try:
+        if (os.path.isfile(dyn_fileentry.fileURL) and os.path.isfile(dyn_gentry.fileUrl)):
+          template = {
+            request.get_json()['data_name']: {
+              "data": request.get_json()['data_item'],
+              "meta": [
+                {
+                  "created_on": time.time(),
+                  "collection_id": dbhelper.UUIDGenerator()
+                }
+              ]
+            }
+          }
+
           with open(dyn_fileentry.fileURL, 'r+') as usr_ent:
             a = json.load(usr_ent)
-            a.update(template)
+            a.get(current_user.uid).update(template)
+
+            usr_ent.seek(0)
             json.dump(a, usr_ent)
 
           with open(dyn_gentry.fileUrl, 'r+') as general_ent:
             a = json.load(general_ent)
-            a.update(template)
+            a.get(current_user.uid).update(template)
+            
+            general_ent.seek(0)
             json.dump(a, general_ent)
 
-        except FileNotFoundError as e:
+          return jsonify({"data_saved": True}), 201
+
+        elif (not os.path.isfile(dyn_fileentry.fileURL) and os.path.isfile(dyn_gentry.fileUrl)):
+          template = {
+            current_user.uid: {
+              request.get_json()['data_name']: {
+                "data": request.get_json()['data_item'],
+                "meta": [
+                  {
+                    "created_on": time.time(),
+                    "collection_id": dbhelper.UUIDGenerator()
+                  }
+                ]
+              }
+            }
+          }
+
+          with open(dyn_fileentry.fileURL, 'w') as usr_ent:
+            json.dump(template, usr_ent)
+          
+          with open(dyn_gentry.fileUrl, 'r+') as general_ent:
+            a = json.load(general_ent)
+            a.update(template)
+            
+            general_ent.seek(0)
+            json.dump(a, general_ent)
+
+          return jsonify({"data_saved": True}), 201
+
+        elif (not os.path.isfile(dyn_fileentry.fileURL) and not os.path.isfile(dyn_gentry.fileUrl)):
           template = {
             current_user.uid: {
               request.get_json()['data_name']: {
@@ -170,14 +217,17 @@ def resource(current_user):
           with open(dyn_gentry.fileUrl, 'w') as general_ent:
             json.dump(template, general_ent)
 
-        except Exception as e:
-          print(e)
-          abort(500, {'ServerError': "something went wrong"})
+          return jsonify({"data_saved": True}), 201
 
-        return jsonify({"data_saved": True}), 201
+        else :
+          abort(500, {'ServerError': "something went wrong"})
 
       except KeyError as e:
         abort(401, {'InvalidRequestBodyError': 'Not sufficient or wrong argument given'})
+
+      except Exception as e:
+        print(e)
+        abort(500, {'ServerError': "something went wrong"})
 
     else:
       abort(400, {'TypeError': 'You submitted non-json body!'})
