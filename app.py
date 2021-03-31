@@ -1,8 +1,7 @@
 from router import api, main_page
-from config import db
 from flask import Flask
 from model import User
-
+from config import db
 import os
 
 app = Flask(__name__)
@@ -14,6 +13,7 @@ app.register_blueprint(main_page)
 with app.app_context():
   db.init_app(app)
   db.create_all()
+  
 
 
 if __name__ == '__main__':
