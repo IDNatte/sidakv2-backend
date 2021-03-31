@@ -29,18 +29,15 @@ def before_request():
 @api_endpoint.app_errorhandler(401)
 @api_endpoint.app_errorhandler(405)
 @api_endpoint.app_errorhandler(404)
-@cross_origin()
 def errorhandler(error):
   return jsonify({"status": error.code, "message": error.description})
 
 # server info API
 @api_endpoint.route('/api', methods=['GET'])
-@cross_origin()
 def server_info():
   sv_info = {
     "flask_ver": flask.__version__,
     "python_ver": platform.sys.version,
-    "build_status": os.environ['FLASK_ENV'],
     "operating_system": platform.system(),
     "current_timestamp": datetime.datetime.now(),
     "load_time": g.request_time()
@@ -50,7 +47,6 @@ def server_info():
 
 # authorization API
 @api_endpoint.route('/api/auth/login', methods=["POST"])
-@cross_origin()
 def authorization():
   if request.method == "POST":
     try:
@@ -78,7 +74,6 @@ def authorization():
       abort(401, {'authorizationError': 'User unavailable'})
 
 @api_endpoint.route('/api/auth/register', methods=["POST"])
-@cross_origin()
 def register():
 
   try:
@@ -115,7 +110,6 @@ def register():
 
 # user info API
 @api_endpoint.route('/api/user/me', methods=["GET"])
-@cross_origin()
 @authentication
 def get_me(current_user):
   return jsonify({
@@ -127,7 +121,6 @@ def get_me(current_user):
 
 # resource API
 @api_endpoint.route('/api/resource', methods=["GET", "POST", "PATCH", "DELETE"])
-@cross_origin()
 @authentication
 def resource(current_user):
   if request.method == 'GET':
@@ -250,7 +243,6 @@ def resource(current_user):
 
 
 @api_endpoint.route('/api/general/resource', methods=["GET"])
-@cross_origin()
 def general_r():
   d = dyn_gentry = GeneralFileEntry.query.one()
   with open(d.fileUrl, 'r') as general_res:
@@ -258,7 +250,6 @@ def general_r():
 
 # remove this on deployment mode
 @api_endpoint.route('/api/init_general')
-@cross_origin()
 def init_general():
   try:
     test = GeneralFileEntry()
