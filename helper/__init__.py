@@ -22,10 +22,9 @@ def authentication(f):
 
     except (jwt.exceptions.DecodeError, AttributeError) as e:
       print(e)
-      abort(401, {'authorizationError': 'Invalid authorization'})
+      abort(401, {'authorizationError': 'Invalid authorization key'})
 
     except KeyError as e:
-      # print(e)
       abort(401, {'authorizationError': 'Invalid authorization header'})
 
   return decorator
