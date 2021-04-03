@@ -11,11 +11,11 @@ main_page = Blueprint('main_page', __name__, template_folder=template_folder, st
 
 @main_page.app_errorhandler(404)
 def error_4xx(error):
-  return render_template('error/4xx.html', error=error)
+  return render_template('error/4xx.html', error=error), error.code
 
 @main_page.app_errorhandler(500)
 def error_5xx(error):
-  return render_template('error/5xx.html', error=error)
+  return render_template('error/5xx.html', error=error), error.code
 
 
 @main_page.route('/')
