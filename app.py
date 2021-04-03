@@ -15,9 +15,11 @@ app.register_blueprint(main_page)
 with app.app_context():
   db.init_app(app)
   db.create_all()
-  
-
 
 if __name__ == '__main__':
-  app.run(debug=True, port=8000)
+  if os.environ.get('FLASK_ENV') == 'production':
+    app.run()
 
+  else:
+    os.environ['FLASK_ENV'] = 'development'
+    app.run(debug=True, port=8000)

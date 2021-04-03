@@ -6,7 +6,6 @@ from flask_cors import cross_origin
 from helper import authentication
 from config import db
 import sqlalchemy
-import pprint
 import platform
 import datetime
 import flask
@@ -41,7 +40,8 @@ def server_info():
     "python_ver": platform.sys.version,
     "operating_system": platform.system(),
     "current_timestamp": datetime.datetime.now(),
-    "load_time": g.request_time()
+    "load_time": g.request_time(),
+    "environment": os.environ.get('FLASK_ENV')
   }
 
   return jsonify(sv_info)
