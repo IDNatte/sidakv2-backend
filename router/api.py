@@ -135,14 +135,11 @@ def resource(current_user):
 
       if dyn_fileentry.lvl == 1:
         with open(admin_fileentry.fileUrl, 'r') as data_content:
-          return jsonify(json.loads(data_content.read()))
+          return jsonify(json.load(data_content))
 
       elif dyn_fileentry.lvl == 2:
         with open(dyn_fileentry.fileURL, 'r') as data_content:
-          content = json.load(data_content)
-          
-
-          return jsonify(json.loads(data_content.read()))
+          return jsonify(json.load(data_content))
 
     except FileNotFoundError:
       abort(404, {'EmptyDataEntry': 'Your data entry is still empty'})
@@ -159,8 +156,7 @@ def resource(current_user):
               "data": request.get_json()['table_item'],
               "meta":{
                 "created_on": time.time(),
-                "collection_id": dbhelper.UUIDGenerator(),
-                "hidden": False
+                "collection_id": dbhelper.UUIDGenerator()
               }
             }
           }
@@ -188,8 +184,7 @@ def resource(current_user):
                 "data": request.get_json()['table_item'],
                 "meta": {
                   "created_on": time.time(),
-                  "collection_id": dbhelper.UUIDGenerator(),
-                  "hidden": False
+                  "collection_id": dbhelper.UUIDGenerator()
                 }
               }
             }
@@ -214,8 +209,7 @@ def resource(current_user):
                 "data": request.get_json()['table_item'],
                 "meta": {
                   "created_on": time.time(),
-                  "collection_id": dbhelper.UUIDGenerator(),
-                  "hidden": False
+                  "collection_id": dbhelper.UUIDGenerator()
                 }
               }
             }
@@ -326,24 +320,48 @@ def resource(current_user):
         try:
           user = request.get_json()['user_id']
           table_name = request.get_json()['table_name']
+          wich_one = request.get_json()['delete_this']
           u_fe = db.session.query(UserFileEntry.fileURL, User.lvl).join(User).filter(User.uid==user).first()
 
           with open(g_fe.fileUrl, 'r+') as g_delete:
+            x = {'data': []}
             a = json.load(g_delete)
-            a.get(user).get(table_name).get('meta').get('hidden')
+            t = a.get(user).get(table_name).get('data')
 
+            for v in t:
+              if v.get(wich_one) != None:
+                v.pop(wich_one)
+
+              if len(v) != 0:
+                x.get('data').append(v)
+
+            a.get(user).get(table_name).update(x)
+
+            g_delete.seek(0)
+            g_delete.truncate()
             json.dump(a, g_delete)
 
           with open(u_fe.fileURL, 'r+') as uf_delete:
+            x = {'data': []}
             a = json.load(uf_delete)
-            a.get(user).pop(table_name)
+            t = a.get(user).get(table_name).get('data')
 
+            for v in t:
+              if v.get(wich_one) != None:
+                v.pop(wich_one)
+
+              if len(v) != 0:
+                x.get('data').append(v)
+
+            a.get(user).get(table_name).update(x)
+
+            uf_delete.seek(0)
+            uf_delete.truncate()
             json.dump(a, uf_delete)
 
           return jsonify({"deleted": "true admin"})
 
         except KeyError as e:
-          print(e)
           abort(400, {'InvalidRequestBodyError': '{0} parameter not Found'.format(e)})
 
       else:

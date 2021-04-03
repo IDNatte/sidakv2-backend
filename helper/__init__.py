@@ -21,7 +21,6 @@ def authentication(f):
       abort(401, {'authorizationError': 'Token Expired'})
 
     except (jwt.exceptions.DecodeError, AttributeError) as e:
-      print(e)
       abort(401, {'authorizationError': 'Invalid authorization key'})
 
     except KeyError as e:
