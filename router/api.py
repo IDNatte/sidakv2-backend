@@ -75,6 +75,9 @@ def authorization():
       abort(401, {'authorizationError': 'User unavailable'})
 
 @api_endpoint.route('/api/auth/register', methods=["POST"])
+# --IMPORTANT --- add this snippet after initial configuration
+# @authentication
+# def register(current_user):
 def register():
 
   try:
@@ -377,6 +380,9 @@ def resource(current_user):
     else:
       abort(400, {'TypeError': 'You submitted non-json body!'})
 
+  else:
+    abort(405, {'MethodeError': 'Forbidden action'})
+
 
 @api_endpoint.route('/api/general/resource', methods=["GET"])
 def general_r():
@@ -388,14 +394,14 @@ def general_r():
   except FileNotFoundError as e:
     abort(404, {'EmptyDataEntry': 'Data entry is empty'})
 
-# remove this on deployment mode
+# --IMPORTANT --- remove this snippet after initial configuration
 @api_endpoint.route('/api/init_general')
 def init_general():
   try:
     test = GeneralFileEntry()
     db.session.add(test)
     db.session.commit()
-    return ({"data_initiated": True})
+    return ({"initialized": True})
   except Exception as e:
     print(e)
     abort(500, {'ServerError': "something went wrong"})
