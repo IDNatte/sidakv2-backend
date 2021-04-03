@@ -367,6 +367,8 @@ def resource(current_user):
       else:
         try:
           table_name = request.get_json()['table_name']
+          wich_one = request.get_json()['delete_this']
+
           return jsonify({"deleted": "true"})
 
         except KeyError as e:
