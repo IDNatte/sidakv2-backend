@@ -6,7 +6,7 @@ from config import db
 import os
 
 app = Flask(__name__)
-app.config.from_json('flask.config.json')
+app.config.from_json('./config/flask.config.json')
 CORS(app)
 
 app.register_blueprint(api.api_endpoint)
