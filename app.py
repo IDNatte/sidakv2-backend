@@ -18,7 +18,7 @@ with app.app_context():
 
 if __name__ == '__main__':
   if os.environ.get('FLASK_ENV') == 'production':
-    app.run()
+    pass
 
   else:
     os.environ['FLASK_ENV'] = 'development'
