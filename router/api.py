@@ -163,7 +163,8 @@ def resource(current_user):
               "data": request.get_json()['table_item'],
               "meta":{
                 "created_on": time.time(),
-                "collection_id": dbhelper.UUIDGenerator()
+                "collection_id": dbhelper.UUIDGenerator(),
+                "description": request.get_json()['table_description']
               }
             }
           }
@@ -191,7 +192,8 @@ def resource(current_user):
                 "data": request.get_json()['table_item'],
                 "meta": {
                   "created_on": time.time(),
-                  "collection_id": dbhelper.UUIDGenerator()
+                  "collection_id": dbhelper.UUIDGenerator(),
+                  "description": request.get_json()['table_description']
                 }
               }
             }
@@ -216,7 +218,8 @@ def resource(current_user):
                 "data": request.get_json()['table_item'],
                 "meta": {
                   "created_on": time.time(),
-                  "collection_id": dbhelper.UUIDGenerator()
+                  "collection_id": dbhelper.UUIDGenerator(),
+                  "description": request.get_json()['table_description']
                 }
               }
             }
