@@ -125,7 +125,8 @@ def get_me(current_user):
     "email": current_user.email,
     "password": "*****",
     "org": current_user.org,
-    "privilege": "admin" if current_user.lvl == 1 else "cm_moderator"
+    "privilege": "admin" if current_user.lvl == 1 else "cm_moderator",
+    "user_id": current_user.uid
   })
 
 # resource API
