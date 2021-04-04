@@ -32,6 +32,7 @@ def before_request():
 def errorhandler(error):
   return jsonify({"status": error.code, "message": error.description}), error.code
 
+
 # server info API
 @api_endpoint.route('/api', methods=['GET'])
 def server_info():
