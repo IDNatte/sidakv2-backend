@@ -67,6 +67,8 @@ def authorization():
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
         return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
+      else:
+        abort(401, {'authorizationError': 'Wrong username or password'})
 
     except KeyError as e:
       abort(401, {'authorizationError': 'Not sufficient or wrong argument given'})
