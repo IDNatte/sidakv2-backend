@@ -164,7 +164,9 @@ def resource(current_user):
               "meta":{
                 "created_on": time.time(),
                 "collection_id": dbhelper.UUIDGenerator(),
-                "description": request.get_json()['table_description']
+                "description": request.get_json()['table_description'],
+                  "owner_org": current_user.org,
+                  "owner_username": current_user.username
               }
             }
           }
@@ -193,7 +195,9 @@ def resource(current_user):
                 "meta": {
                   "created_on": time.time(),
                   "collection_id": dbhelper.UUIDGenerator(),
-                  "description": request.get_json()['table_description']
+                  "description": request.get_json()['table_description'],
+                  "owner_org": current_user.org,
+                  "owner_username": current_user.username
                 }
               }
             }
@@ -219,7 +223,9 @@ def resource(current_user):
                 "meta": {
                   "created_on": time.time(),
                   "collection_id": dbhelper.UUIDGenerator(),
-                  "description": request.get_json()['table_description']
+                  "description": request.get_json()['table_description'],
+                  "owner_org": current_user.org,
+                  "owner_username": current_user.username
                 }
               }
             }
