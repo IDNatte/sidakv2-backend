@@ -1,5 +1,5 @@
 {
-  "SQLALCHEMY_DATABASE_URI": "mariadb+mysqlconnector://admin:admin123@localhost/sisv_db",
+  "SQLALCHEMY_DATABASE_URI": "mysql+mysqlconnector://admin:admin123@localhost/sisv_db",
   "SQLALCHEMY_TRACK_MODIFICATIONS": false,
   "SECRET_KEY": "&#ZTJX$itKk=nPG&@RN(F;SvZJJLq2;29}3eF&)t%n/Yg-crFJyrZY.*3?=mj-YWxHQnQuZ$HQz2&nKf3#)qRdj[q)jD)jkPfS;6,4Kty)uPb7m8+eRP,Hw#)):_fh6Yq9WqFgq2f@zm$%:Req.euQ)VmkL(&meuFm5kxyjiKHHi#twzCwV6ne==mj7yyG*Wi:[R9&)."
 }
