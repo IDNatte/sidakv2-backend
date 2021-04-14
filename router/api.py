@@ -26,7 +26,12 @@ def before_request():
 # error handler API
 @api_endpoint.app_errorhandler(400)
 @api_endpoint.app_errorhandler(401)
+<<<<<<< HEAD
 @api_endpoint.app_errorhandler(404)
+=======
+@api_endpoint.app_errorhandler(405)
+@api_endpoint.app_errorhandler(410)
+>>>>>>> 2e28ed5d8d9d300237490d4eca6ec91f902624e0
 @api_endpoint.app_errorhandler(500)
 def errorhandler(error):
   return jsonify({"status": error.code, "message": error.description}), error.code
@@ -156,7 +161,7 @@ def resource(current_user):
           return jsonify(json.load(data_content))
 
     except FileNotFoundError:
-      abort(404, {'EmptyDataEntry': 'Your data entry is still empty'})
+      abort(410, {'EmptyDataEntry': 'Your data entry is still empty'})
 
   elif request.method == 'POST':
     if request.headers.get('Content-Type') == 'application/json':
@@ -412,7 +417,7 @@ def general_r():
       return jsonify(json.load(general_res))
 
   except FileNotFoundError as e:
-    abort(404, {'EmptyDataEntry': 'Data entry is empty'})
+    abort(410, {'EmptyDataEntry': 'Data entry is empty'})
 
 # --IMPORTANT --- remove this snippet after initial configuration
 @api_endpoint.route('/api/init_general')
