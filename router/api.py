@@ -26,12 +26,7 @@ def before_request():
 # error handler API
 @api_endpoint.app_errorhandler(400)
 @api_endpoint.app_errorhandler(401)
-<<<<<<< HEAD
 @api_endpoint.app_errorhandler(404)
-=======
-@api_endpoint.app_errorhandler(405)
-@api_endpoint.app_errorhandler(410)
->>>>>>> 2e28ed5d8d9d300237490d4eca6ec91f902624e0
 @api_endpoint.app_errorhandler(500)
 def errorhandler(error):
   return jsonify({"status": error.code, "message": error.description}), error.code
@@ -121,13 +116,16 @@ def register():
       return jsonify(send_back)
 
     except sqlalchemy.exc.IntegrityError as e:
-      abort(401, {'UserExistError': 'Account already registered'})
+      abort(403, {'UserExistError': 'Account already registered'})
 
     except KeyError as e:
-      abort(401, {'InvalidRequestBodyError': 'Not sufficient or wrong argument given'})
+      abort(403, {'InvalidRequestBodyError': 'Not sufficient or wrong argument given'})
+
+    except Exception as e:
+      abort(400, {'MiscError': '{0}'.format(e)})
 
   else:
-    abort(401, {'MethodeError': 'Forbidden action'})
+    abort(400, {'MethodeError': 'Forbidden action'})
 
 # user info API
 @api_endpoint.route('/api/user/me', methods=["GET"])
@@ -418,15 +416,3 @@ def general_r():
 
   except FileNotFoundError as e:
     abort(410, {'EmptyDataEntry': 'Data entry is empty'})
-
-# --IMPORTANT --- remove this snippet after initial configuration
-@api_endpoint.route('/api/init_general')
-def init_general():
-  try:
-    test = GeneralFileEntry()
-    db.session.add(test)
-    db.session.commit()
-    return ({"initialized": True})
-  except Exception as e:
-    print(e)
-    abort(500, {'ServerError': "something went wrong"})
