@@ -26,12 +26,14 @@ def before_request():
 # error handler API
 @api_endpoint.app_errorhandler(400)
 @api_endpoint.app_errorhandler(401)
-@api_endpoint.app_errorhandler(405)
 @api_endpoint.app_errorhandler(404)
 @api_endpoint.app_errorhandler(500)
 def errorhandler(error):
   return jsonify({"status": error.code, "message": error.description}), error.code
 
+@api_endpoint.app_errorhandler(405)
+def errorhandler(error):
+  return jsonify({"status": error.code, "message": error.description}), error.code
 
 # server info API
 @api_endpoint.route('/api', methods=['GET'])
@@ -77,45 +79,50 @@ def authorization():
     except sqlalchemy.exc.NoResultFound as e:
       abort(401, {'authorizationError': 'User unavailable'})
 
-@api_endpoint.route('/api/auth/register', methods=["POST"])
+@api_endpoint.route('/api/auth/register', methods=["GET","POST"])
 # --IMPORTANT --- add this snippet after initial configuration
 # @authentication
 # def register(current_user):
 def register():
 
-  try:
-    file_directory = './data/dynamic/{0}-{1}.json'.format(dbhelper.UUIDGenerator(), request.get_json()['org'])
-    username = request.get_json()['username']
-    password = request.get_json()['password']
-    email = request.get_json()['email']
-    org = request.get_json()['org']
-    lvl = request.get_json()['lvl']
+  if request.method == 'POST':
 
-    u = User(email=email, username=username, org=org, lvl=lvl)
-    u.content = [UserFileEntry(fileURL=file_directory)]
-    u.set_password(password)
-    db.session.add(u)
-    db.session.commit()
+    try:
+      file_directory = './data/dynamic/{0}-{1}.json'.format(dbhelper.UUIDGenerator(), request.get_json()['org'])
+      username = request.get_json()['username']
+      password = request.get_json()['password']
+      email = request.get_json()['email']
+      org = request.get_json()['org']
+      lvl = request.get_json()['lvl']
 
-    db_selector = User.query.filter_by(email=email).first()
+      u = User(email=email, username=username, org=org, lvl=lvl)
+      u.content = [UserFileEntry(fileURL=file_directory)]
+      u.set_password(password)
+      db.session.add(u)
+      db.session.commit()
 
-    send_back = {
-      "user_id": db_selector.uid,
-      "username": db_selector.username,
-      "email": db_selector.email,
-      "password": "protected",
-      "org": db_selector.org,
-      "status": "registered",
-      "privilege": "admin" if u.lvl == 1 else "cm_moderator"
-    }
+      db_selector = User.query.filter_by(email=email).first()
 
-    return jsonify(send_back)
+      send_back = {
+        "user_id": db_selector.uid,
+        "username": db_selector.username,
+        "email": db_selector.email,
+        "password": "protected",
+        "org": db_selector.org,
+        "status": "registered",
+        "privilege": "admin" if u.lvl == 1 else "cm_moderator"
+      }
 
-  except sqlalchemy.exc.IntegrityError as e:
-    abort(401, {'UserExistError': 'Account already registered'})
+      return jsonify(send_back)
 
-  except KeyError as e:
-    abort(401, {'InvalidRequestBodyError': 'Not sufficient or wrong argument given'})
+    except sqlalchemy.exc.IntegrityError as e:
+      abort(401, {'UserExistError': 'Account already registered'})
+
+    except KeyError as e:
+      abort(401, {'InvalidRequestBodyError': 'Not sufficient or wrong argument given'})
+
+  else:
+    abort(401, {'MethodeError': 'Forbidden action'})
 
 # user info API
 @api_endpoint.route('/api/user/me', methods=["GET"])
