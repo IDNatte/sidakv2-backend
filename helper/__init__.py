@@ -1,11 +1,8 @@
 """Helper class"""
-
 from flask import current_app, request, abort
 from functools import wraps
 from model import User
-import hashlib
 import jwt
-import os
 
 def authentication(f):
   """Authentication helper"""
@@ -14,16 +11,16 @@ def authentication(f):
     try:
       token = token = request.headers['Authorization']
       data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-      current_user = User.query.filter_by(uid=data['carrier']['uid']).first()
+      current_user = User.objects.get(id=data['carrier']['uid'])
       return f(current_user, *args, **kwargs)
 
-    except jwt.exceptions.ExpiredSignature as e:
+    except jwt.exceptions.ExpiredSignature:
       abort(401, {'authorizationError': 'Token Expired'})
 
-    except (jwt.exceptions.DecodeError, AttributeError) as e:
+    except jwt.exceptions.DecodeError:
       abort(401, {'authorizationError': 'Invalid authorization key'})
 
-    except KeyError as e:
+    except KeyError:
       abort(401, {'authorizationError': 'Invalid authorization header'})
 
   return decorator

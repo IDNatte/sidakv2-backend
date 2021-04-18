@@ -30,7 +30,19 @@ body {
   fill: rgb(233, 166, 150)!important;
 }
 
-.error-msg {
+.underwork svg:hover {
+  fill: rgb(212, 184, 141)!important;
+}
+
+.error-msg,
+.underwork-msg {
   padding: 30px 0px;
   text-align: center;
+}
+
+.block-quotes {
+  background-color: rgb(145, 145, 145);
+  color: #e8e8e8;
+  padding: 2px;
+  border-radius: 2px;
 }

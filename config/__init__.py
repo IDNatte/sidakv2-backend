@@ -1,6 +1,5 @@
 # system config
 """SQLAlchemy and dynamic database config"""
-from flask_sqlalchemy import SQLAlchemy
+from flask_mongoengine import MongoEngine
 
-
-db = SQLAlchemy()
+db = MongoEngine()
