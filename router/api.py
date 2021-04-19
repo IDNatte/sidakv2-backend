@@ -147,10 +147,42 @@ def resource(current_user):
   if request.method == 'GET':
     if current_user.lvl == 1:
       content = DynamicData.objects()
-      return jsonify(content)
+      content_response = []
+      for x in content:
+        c_data = {
+          "table_id": str(x.id),
+          "created_on": x.created_on,
+          "table_name": x.table_name,
+          "table_description": x.table_desc,
+          "table_content": x.table_content,
+          "owner" : {
+            "owner_name": x.owner.username,
+            "owner_org": x.owner.org,
+            "owner_id": str(x.owner.id)
+          }
+        }
+
+        content_response.append(c_data)
+
+      return jsonify(content_response)
     else:
       content = DynamicData.objects(owner=current_user)
-      return jsonify(content)
+      content_response = []
+      for x in content:
+        c_data = {
+          "table_id": str(x.id),
+          "created_on": x.created_on,
+          "table_name": x.table_name,
+          "table_description": x.table_desc,
+          "table_content": x.table_content,
+          "owner" : {
+            "owner_name": x.owner.username,
+            "owner_org": x.owner.org,
+          }
+        }
+
+        content_response.append(c_data)
+      return jsonify(content_response)
 
   elif request.method == 'POST':
     try:
