@@ -298,6 +298,7 @@ def general_res():
     payload = {
       "table_name": x.table_name,
       "table_content": x.table_content,
+      "display": x.display
       "table_owner": {
         "username": x.owner.username,
         "organization": x.owner.org
