@@ -189,8 +189,9 @@ def resource(current_user):
       table_name = request.get_json()['table_name']
       table_desc = request.get_json()['table_description']
       table_content = request.get_json()['table_content']
+      display = request.get_json()['display']
 
-      table = DynamicData(owner=current_user, table_name=table_name, table_desc=table_desc, table_content=table_content)
+      table = DynamicData(owner=current_user, table_name=table_name, table_desc=table_desc, display=display, table_content=table_content)
       table.save()
 
       return ({'created': True})
