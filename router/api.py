@@ -155,6 +155,7 @@ def resource(current_user):
           "table_name": x.table_name,
           "table_description": x.table_desc,
           "table_content": x.table_content,
+          "display": x.display,
           "owner" : {
             "owner_name": x.owner.username,
             "owner_org": x.owner.org,
@@ -175,6 +176,7 @@ def resource(current_user):
           "table_name": x.table_name,
           "table_description": x.table_desc,
           "table_content": x.table_content,
+          "display": x.display,
           "owner" : {
             "owner_name": x.owner.username,
             "owner_org": x.owner.org,
