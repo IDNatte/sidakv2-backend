@@ -78,7 +78,8 @@ def register(current_user):
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
 
-        organization = Organization.objects(sector_group.id==sectoral, id=org).get()
+        sectoral = SectoralGroup.objects(id=sector).get()
+        organization = Organization.objects(sector_group=sectoral, id=org).get()
 
         user = User(username=username, email=email, org=organization, lvl=lvl)
         user.password = dbhelper.generate_password_hash(password)
