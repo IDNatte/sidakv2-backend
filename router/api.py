@@ -98,7 +98,7 @@ def register(current_user):
           return jsonify(send_back)
 
         else:
-          abort(403, {'orgListError': 'No organization or sector list'})          
+          abort(403, {'orgListError': 'No organization or sector list registered'})          
 
 
       else:
