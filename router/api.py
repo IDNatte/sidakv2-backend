@@ -78,7 +78,7 @@ def register(current_user):
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
 
-        sectoral = SectoralGroup.objects(sector_name=sector_name).get()
+        sectoral = SectoralGroup.objects(sector_name=sector).get()
         organization = Organization.objects(sector_group=sectoral, org_name=org).get()
 
         user = User(username=username, email=email, org=org, lvl=lvl)
