@@ -81,7 +81,7 @@ def register(current_user):
         sectoral = SectoralGroup.objects(sector_name=sector).get()
         organization = Organization.objects(sector_group=sectoral, org_name=org).get()
 
-        user = User(username=username, email=email, org=org, lvl=lvl)
+        user = User(username=username, email=email, org=organization, lvl=lvl)
         user.password = dbhelper.generate_password_hash(password)
         user.save()
 
