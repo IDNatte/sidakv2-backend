@@ -227,7 +227,7 @@ def org_list(current_user):
           "org_id": x.id,
           "org_name": x.org_name,
           "org_sector": {
-            "sector_id": str(x.sector_group.id)
+            "sector_id": str(x.sector_group.id),
             "sector_name": x.sector_group.sector_name,
           }
         }
