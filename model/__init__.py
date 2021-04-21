@@ -1,11 +1,18 @@
 from datetime import datetime
 from mongoengine import *
 
+class SectoralGroup(Document):
+  sector_name = StringField(required=True)
+
+class Organization(Document):
+  org_name = StringField(required=True)
+  sector_group = ReferenceField(SectoralGroup)
+
 class User(Document):
   username = StringField(max_length=30, required=True, unique=True)
   email = EmailField(max_length=150, required=True, unique=True)
   password = StringField(max_length= 150, required=True, unique=True)
-  org = StringField(required=True)
+  org = ReferenceField(Organization)
   lvl = IntField(required=True)
 
 class DynamicData(DynamicDocument):

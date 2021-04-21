@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, g, abort, current_app
-from model import User, DynamicData , dbhelper
+from model import User, DynamicData, Organization, SectoralGroup, dbhelper
 from helper import authentication
 import mongoengine
 import datetime
@@ -74,8 +74,12 @@ def register(current_user):
         username = request.get_json()['username']
         password = request.get_json()['password']
         email = request.get_json()['email']
+        sector = request.get_json()['sector']
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
+
+        sectoral = SectoralGroup.objects(sector_name=sector_name).get()
+        organization = Organization.objects(sector_group=sectoral, org_name=org).get()
 
         user = User(username=username, email=email, org=org, lvl=lvl)
         user.password = dbhelper.generate_password_hash(password)
@@ -86,7 +90,7 @@ def register(current_user):
           "username": str(user.username),
           "email": str(user.email),
           "password": "protected",
-          "org": str(user.org),
+          "org": str(user.org.org_name),
           "status": "registered",
           "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator"
         }
@@ -100,11 +104,13 @@ def register(current_user):
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
     except (mongoengine.errors.NotUniqueError) as e:
+      print(e)
       abort(403, {'AccountError': 'Account already registered'})
 
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
 
+# protected endpoint
 @api_endpoint.route('/api/user/me', methods=["GET"])
 @authentication
 def get_me(current_user):
@@ -140,6 +146,82 @@ def user_list(current_user):
       abort(401, {'authorizationError': 'Only admin can see user list!'})
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/sectoral', methods=["GET", "POST"])
+@authentication
+def sector_list(current_user):
+  if request.method == "GET":
+    web_query = request.get_json()
+    if web_query:
+      sector_query = web_query.get('sector_name')
+      sector_list = SectoralGroup.objects(sector_name=sector_query).get()
+      return jsonify(sector_list)
+
+    else:
+      sector_list = SectoralGroup.objects
+      return jsonify(sector_list)
+
+  elif request.method == "POST":
+    try:
+      sector_name = request.get_json()['sector_name']
+      sector = SectoralGroup(sector_name=sector_name)
+      sector.save()
+
+      return jsonify({ 'sector_created': True })
+
+    except KeyError:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/org', methods=["GET", "POST"])
+@authentication
+def org_list(current_user):
+  if request.method == "GET":
+    web_query = request.get_json()
+    if web_query:
+      sector_query = web_query.get('sector_id')
+      org_query = web_query.get('org_name')
+
+      try:
+        if sector_query and org_query:
+          org_list = Organization.objects.filter(id=org_query, sector_group=sector_query)      
+          return jsonify(org_list)
+
+        elif not sector_query and org_query:
+          org_list = Organization.objects.filter(org_name=org_query).get()
+          return jsonify(org_list)
+
+        elif sector_query and not org_query:
+          org_list = Organization.objects.filter(sector_group=sector_query)      
+          return jsonify(org_list)
+
+        else:
+          abort(403, {'InvalidRequestBodyError': 'Argument org_name or sector_id not found in body'})
+
+      except mongoengine.errors.ValidationError:
+        abort(403, {'InvalidRequestBodyError': 'Mixed parameter in body founded'})
+
+    else:
+      org_list = Organization.objects
+      return jsonify(org_list)
+
+  elif request.method == "POST":
+    try:
+      sector_id = request.get_json()['sector_id']
+      org_name = request.get_json()['org_name']
+      sector = SectoralGroup.objects(id=sector_id).get()
+      org = Organization(org_name=org_name, sector_group=sector)
+      org.save()
+
+      return jsonify({"organization_created": True})
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+  else:
+    abort(400, {'MethodeError': 'Forbidden action'})
 
 @api_endpoint.route('/api/resource', methods=["GET", "POST", "PATCH", "DELETE"])
 @authentication
@@ -289,6 +371,38 @@ def resource(current_user):
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
+# general endpoint
+@api_endpoint.route('/api/public/sectoral')
+def general_sect():
+  carrier = []
+  sector = SectoralGroup.objects()
+
+  for x in sector:
+    print(x.sector_name)
+    payload = {
+      "sector_id": str(x.id),
+      "sector_name": x.sector_name
+    }
+    carrier.append(payload)
+  return jsonify(carrier)
+
+@api_endpoint.route('/api/public/org')
+def general_org():
+  carrier = []
+  org = Organization.objects()
+
+  for x in org:
+    payload = {
+      "org_id": str(x.id),
+      "org_name": x.org_name,
+      "sector": {
+        "sector_id": str(x.sector_group.id),
+        "sector_name": x.sector_group.sector_name
+      }
+    }
+    carrier.append(payload)
+  return jsonify(carrier)
+
 @api_endpoint.route('/api/public/resource')
 def general_res():
   carrier = []
@@ -305,5 +419,4 @@ def general_res():
       }
     }
     carrier.append(payload)
-
   return jsonify(carrier)
