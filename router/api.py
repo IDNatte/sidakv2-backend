@@ -224,7 +224,7 @@ def org_list(current_user):
 
       for x in org_list:
         payload = {
-          "org_id": x.id
+          "org_id": x.id,
           "org_name": x.org_name,
           "org_sector": {
             "sector_id": str(x.sector_group.id)
