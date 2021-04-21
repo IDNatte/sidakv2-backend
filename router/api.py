@@ -166,7 +166,7 @@ def sector_list(current_user):
       for x in sector_list:
         paylod = {
           "sector_id": str(x.sector_id),
-          "sector_name": x,sector_name
+          "sector_name": x.sector_name
         }
 
         carrier.append(paylod)
