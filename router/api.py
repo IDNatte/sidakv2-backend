@@ -107,7 +107,7 @@ def register(current_user):
       abort(403, {'AccountError': 'Account already registered'})
 
     except (mongoengine.errors.DoesNotExist):
-      abort(403, {'AccountError': 'Account already registered'})
+      abort(403, {'AccountError': 'Sector or Organization not exists'})
 
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
