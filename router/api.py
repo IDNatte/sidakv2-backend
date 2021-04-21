@@ -78,8 +78,7 @@ def register(current_user):
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
 
-        sectoral = SectoralGroup.objects(sector_name=sector).get()
-        organization = Organization.objects(sector_group=sectoral, org_name=org).get()
+        organization = Organization.objects(sector_group.id=sectoral, id=org).get()
 
         user = User(username=username, email=email, org=organization, lvl=lvl)
         user.password = dbhelper.generate_password_hash(password)
@@ -91,7 +90,6 @@ def register(current_user):
           "email": str(user.email),
           "password": "protected",
           "org": str(user.org.org_name),
-          "status": "registered",
           "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator"
         }
 
