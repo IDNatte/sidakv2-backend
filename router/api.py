@@ -242,7 +242,7 @@ def resource(current_user):
           "display": x.display,
           "owner" : {
             "owner_name": x.owner.username,
-            "owner_org": x.owner.org,
+            "owner_org": x.owner.org.org_name,
             "owner_id": str(x.owner.id)
           }
         }
@@ -263,7 +263,7 @@ def resource(current_user):
           "display": x.display,
           "owner" : {
             "owner_name": x.owner.username,
-            "owner_org": x.owner.org,
+            "owner_org": x.owner.org.org_name,
           }
         }
 
