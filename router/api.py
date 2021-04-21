@@ -165,7 +165,7 @@ def sector_list(current_user):
 
       for x in sector_list:
         paylod = {
-          "sector_id": str(x.sector_id),
+          "sector_id": str(x.id),
           "sector_name": x.sector_name
         }
 
