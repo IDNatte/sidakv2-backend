@@ -98,7 +98,7 @@ def register(current_user):
         return jsonify(send_back)
 
       else:
-        abort(401, {'authorizationError': 'Only admin can registering new user !'})
+        abort(401, {'authorizationError': 'Only admin can perform this action !'})
 
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
@@ -164,15 +164,19 @@ def sector_list(current_user):
       return jsonify(sector_list)
 
   elif request.method == "POST":
-    try:
-      sector_name = request.get_json()['sector_name']
-      sector = SectoralGroup(sector_name=sector_name)
-      sector.save()
+    if current_user.lvl == 1:
+      try:
+        sector_name = request.get_json()['sector_name']
+        sector = SectoralGroup(sector_name=sector_name)
+        sector.save()
 
-      return jsonify({ 'sector_created': True })
+        return jsonify({ 'sector_created': True })
 
-    except KeyError as e:
-      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+      except KeyError as e:
+        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    else:
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})
 
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
@@ -210,17 +214,21 @@ def org_list(current_user):
       return jsonify(org_list)
 
   elif request.method == "POST":
-    try:
-      sector_id = request.get_json()['sector_id']
-      org_name = request.get_json()['org_name']
-      sector = SectoralGroup.objects(id=sector_id).get()
-      org = Organization(org_name=org_name, sector_group=sector)
-      org.save()
+    if current_user == 1:
+      try:
+        sector_id = request.get_json()['sector_id']
+        org_name = request.get_json()['org_name']
+        sector = SectoralGroup.objects(id=sector_id).get()
+        org = Organization(org_name=org_name, sector_group=sector)
+        org.save()
 
-      return jsonify({"organization_created": True})
+        return jsonify({"organization_created": True})
 
-    except KeyError as e:
-      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+      except KeyError as e:
+        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    else:
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})
 
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
