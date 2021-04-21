@@ -157,11 +157,20 @@ def sector_list(current_user):
     if web_query:
       sector_query = web_query.get('sector_name')
       sector_list = SectoralGroup.objects(sector_name=sector_query).get()
-      return jsonify(sector_list)
+      return jsonify({"sector_id": sector_list.id, "sector_name": sector_list.sector_name})
 
     else:
+      carrier = []
       sector_list = SectoralGroup.objects
-      return jsonify(sector_list)
+
+      for x in sector_list:
+        paylod = {
+          "sector_id": str(x.sector_id),
+          "sector_name": x,sector_name
+        }
+
+        carrier.append(paylod)
+      return jsonify(carrier)
 
   elif request.method == "POST":
     if current_user.lvl == 1:
@@ -192,7 +201,7 @@ def org_list(current_user):
 
       try:
         if sector_query and org_query:
-          org_list = Organization.objects.filter(id=org_query, sector_group=sector_query)      
+          org_list = Organization.objects.filter(id=org_query, sector_group=sector_query).get()      
           return jsonify(org_list)
 
         elif not sector_query and org_query:
@@ -210,7 +219,20 @@ def org_list(current_user):
         abort(403, {'InvalidRequestBodyError': 'Mixed parameter in body founded'})
 
     else:
+      carrier = []
       org_list = Organization.objects
+
+      for x in org_list:
+        payload = {
+          "org_id": x.id
+          "org_name": x.org_name,
+          "org_sector": {
+            "sector_id": str(x.sector_group.id)
+            "sector_name": x.sector_group.sector_name,
+          }
+        }
+
+        carrier.append(payload)
       return jsonify(org_list)
 
   elif request.method == "POST":
