@@ -233,7 +233,7 @@ def org_list(current_user):
         }
 
         carrier.append(payload)
-      return jsonify(org_list)
+      return jsonify(carrier)
 
   elif request.method == "POST":
     if current_user == 1:
