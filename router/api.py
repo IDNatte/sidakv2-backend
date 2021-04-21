@@ -169,7 +169,7 @@ def sector_list(current_user):
 
       return jsonify({ 'sector_created': True })
 
-    except KeyError:
+    except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
   else:
