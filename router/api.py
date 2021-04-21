@@ -103,8 +103,10 @@ def register(current_user):
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
-    except (mongoengine.errors.NotUniqueError) as e:
-      print(e)
+    except (mongoengine.errors.NotUniqueError):
+      abort(403, {'AccountError': 'Account already registered'})
+
+    except (mongoengine.errors.DoesNotExist):
       abort(403, {'AccountError': 'Account already registered'})
 
   else:
