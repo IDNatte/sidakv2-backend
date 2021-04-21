@@ -78,23 +78,28 @@ def register(current_user):
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
 
-        sectoral = SectoralGroup.objects(id=sector).get()
-        organization = Organization.objects(sector_group=sectoral, id=org).get()
+        organization = Organization.objects.filter(id=org, sector_group=sector).count()
 
-        user = User(username=username, email=email, org=organization, lvl=lvl)
-        user.password = dbhelper.generate_password_hash(password)
-        user.save()
+        if organization > 0:
 
-        send_back = {
-          "user_id": str(user.id),
-          "username": str(user.username),
-          "email": str(user.email),
-          "password": "protected",
-          "org": str(user.org.org_name),
-          "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator"
-        }
+          user = User(username=username, email=email, org=organization, lvl=lvl)
+          user.password = dbhelper.generate_password_hash(password)
+          user.save()
 
-        return jsonify(send_back)
+          send_back = {
+            "user_id": str(user.id),
+            "username": str(user.username),
+            "email": str(user.email),
+            "password": "protected",
+            "org": str(user.org.org_name),
+            "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator"
+          }
+          
+          return jsonify(send_back)
+
+        else:
+          abort(403, {'orgListError': 'No organization or sector list'})          
+
 
       else:
         abort(401, {'authorizationError': 'Only admin can perform this action !'})
@@ -105,8 +110,9 @@ def register(current_user):
     except (mongoengine.errors.NotUniqueError):
       abort(403, {'AccountError': 'Account already registered'})
 
-    except (mongoengine.errors.DoesNotExist):
-      abort(403, {'AccountError': 'Sector or Organization not exists'})
+
+    except mongoengine.errors.ValidationError:
+      abort(403, {'InvalidRequestBodyError': 'Argument secotor or org suplied by non-id value !'})
 
   else:
     abort(400, {'MethodeError': 'Forbidden action'})

@@ -1,5 +1,6 @@
 """Helper class"""
 from flask import current_app, request, abort
+from mongoengine import errors
 from functools import wraps
 from model import User
 import jwt
@@ -22,5 +23,8 @@ def authentication(f):
 
     except KeyError:
       abort(401, {'authorizationError': 'Invalid authorization header'})
+
+    except errors.DoesNotExist:
+      abort(401, {'authorizationError': 'Invalid authorization'})
 
   return decorator
