@@ -78,7 +78,7 @@ def register(current_user):
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
 
-        organization = Organization.objects.filter(id=org, sector_group=sector)
+        organization = Organization.objects.filter(id=org, sector_group=sector).get()
         counter = organization.count()
 
         if counter > 0:
