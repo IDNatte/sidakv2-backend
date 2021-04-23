@@ -78,10 +78,11 @@ def register(current_user):
         org = request.get_json()['org']
         lvl = request.get_json()['lvl']
 
-        organization = Organization.objects.filter(id=org, sector_group=sector).get()
-        counter = organization.count()
+        org_search = Organization.objects.filter(id=org, sector_group=sector).count()
 
-        if counter > 0:
+        if org_search > 0:
+
+          organization = Organization.objects.filter(id=org, sector_group=sector).get()
 
           user = User(username=username, email=email, org=organization, lvl=lvl)
           user.password = dbhelper.generate_password_hash(password)
