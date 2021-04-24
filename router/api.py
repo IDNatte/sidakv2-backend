@@ -243,7 +243,7 @@ def org_list(current_user):
       return jsonify(carrier)
 
   elif request.method == "POST":
-    if current_user == 1:
+    if current_user.lvl == 1:
       try:
         sector_id = request.get_json()['sector_id']
         org_name = request.get_json()['org_name']
@@ -444,19 +444,182 @@ def general_org():
 
 @api_endpoint.route('/api/public/resource')
 def general_res():
-  carrier = []
-  table = DynamicData.objects()
+  query = request.args.get('q')
 
-  for x in table:
-    payload = {
-      "table_name": x.table_name,
-      "table_content": x.table_content,
-      "display": x.display,
-      "table_owner": {
-        "username": x.owner.username,
-        "organization": x.owner.org.org_name,
-        "sector": x.owner.org.sector_group.sector_name
+  if not query:
+    carrier = []
+    table = DynamicData.objects()
+
+    for x in table:
+      payload = {
+        "table_name": x.table_name,
+        "table_content": x.table_content,
+        "display": x.display,
+        "table_owner": {
+          "username": x.owner.username,
+          "organization": x.owner.org.org_name,
+          "sector": x.owner.org.sector_group.sector_name
+        }
       }
-    }
-    carrier.append(payload)
-  return jsonify(carrier)
+      carrier.append(payload)
+    return jsonify(carrier)
+
+  elif query:
+    group_by = request.args.get('group_by')
+
+    if group_by == "sector":
+      sector_name = request.args.get('sector')
+
+      if sector_name:
+        carrier = []
+        sector = SectoralGroup.objects(sector_name__iexact=sector_name)
+        org = Organization.objects(sector_group__in=sector).all()
+        owner = User.objects(org__in=org).all()
+        data = DynamicData.objects(owner__in=owner).all()
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+
+      else:
+        carrier = []
+        data = DynamicData.objects()
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+  
+    elif group_by == 'display':
+      display = request.args.get('display_by')
+      if display == 'chart':
+        carrier = []
+        data = DynamicData.objects(display=display)
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+
+      elif display == 'table':
+        carrier = []
+        data = DynamicData.objects(display=display)
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+
+      else:
+        carrier = []
+        data = DynamicData.objects()
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+
+    elif group_by == 'organization':
+      org_name = request.args.get('org')
+
+      if org_name:
+        carrier = []
+        org = Organization.objects(org_name__iexact=org_name)
+        owner = User.objects(org__in=org).all()
+        data = DynamicData.objects(owner__in=owner).all()
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+
+      else:
+        carrier = []
+        data = DynamicData.objects()
+
+        for x in data:
+          payload = {
+            "table_name": x.table_name,
+            "table_content": x.table_content,
+            "display": x.display,
+            "table_owner": {
+              "username": x.owner.username,
+              "organization": x.owner.org.org_name,
+              "sector": x.owner.org.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        return jsonify(carrier)
+      
+    else:
+      carrier = []
+      table = DynamicData.objects()
+
+      for x in table:
+        payload = {
+          "table_name": x.table_name,
+          "table_content": x.table_content,
+          "display": x.display,
+          "table_owner": {
+            "username": x.owner.username,
+            "organization": x.owner.org.org_name,
+            "sector": x.owner.org.sector_group.sector_name
+          }
+        }
+        carrier.append(payload)
+      return jsonify(carrier)
