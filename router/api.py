@@ -144,7 +144,7 @@ def user_list(current_user):
           "user_id": str(x.id),
           "username": x.username,
           "password": "protected",
-          "organization": x.org,
+          "organization": x.org.org_name,
           "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator"
         }
 
@@ -454,7 +454,8 @@ def general_res():
       "display": x.display,
       "table_owner": {
         "username": x.owner.username,
-        "organization": x.owner.org
+        "organization": x.owner.org_name,
+        "sector": x.owner.org.sector_group.sector_name
       }
     }
     carrier.append(payload)
