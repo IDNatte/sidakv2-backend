@@ -454,7 +454,7 @@ def general_res():
       "display": x.display,
       "table_owner": {
         "username": x.owner.username,
-        "organization": x.owner.org_name,
+        "organization": x.owner.org.org_name,
         "sector": x.owner.org.sector_group.sector_name
       }
     }
