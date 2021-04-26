@@ -12,6 +12,7 @@ class User(Document):
   username = StringField(max_length=30, required=True, unique=True)
   email = EmailField(max_length=150, required=True, unique=True)
   password = StringField(max_length= 150, required=True, unique=True)
+  is_active = BooleanField(required=True)
   org = ReferenceField(Organization)
   lvl = IntField(required=True)
 

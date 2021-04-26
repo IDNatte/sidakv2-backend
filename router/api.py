@@ -1,10 +1,12 @@
-from flask import Blueprint, jsonify, request, g, abort, current_app
+from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
 from model import User, DynamicData, Organization, SectoralGroup, dbhelper
-from helper import authentication
+from helper import authentication, allowed_file
+from werkzeug import utils
 import mongoengine
 import datetime
 import time
 import jwt
+import os
 
 api_endpoint = Blueprint('api_endpoint', __name__)
 
@@ -37,125 +39,6 @@ def server_info():
   return jsonify(sv_info)
 
 # authorization API
-@api_endpoint.route('/api/auth/login', methods=["POST"])
-def authorization():
-  if request.method == "POST":
-    try:
-      email = request.get_json()['email']
-      password = request.get_json()['password']
-      
-      user_data = User.objects.get(email=email)
-      passwd_authentication = dbhelper.check_password(user_data.password, password)
-
-      if passwd_authentication:
-        token_exp = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        token = jwt.encode({
-          "carrier": {
-            "uid": str(user_data.id)
-          },
-          'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1), 
-        }, current_app.config['SECRET_KEY'], algorithm='HS256')
-        return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
-      else:
-        abort(401, {'authorizationError': 'Wrong password'})
-
-    except KeyError as e:
-      abort(401, {'authorizationError': 'Not sufficient or wrong argument given'})
-
-    except mongoengine.errors.DoesNotExist as e:
-      abort(401, {'authorizationError': 'Email not registered'})
-
-@api_endpoint.route('/api/auth/register', methods=["GET","POST"])
-@authentication
-def register(current_user):
-  if request.method == 'POST':
-    try:
-      if current_user.lvl == 1:
-        username = request.get_json()['username']
-        password = request.get_json()['password']
-        email = request.get_json()['email']
-        sector = request.get_json()['sector']
-        org = request.get_json()['org']
-        lvl = request.get_json()['lvl']
-
-        org_search = Organization.objects.filter(id=org, sector_group=sector).count()
-
-        if org_search > 0:
-
-          organization = Organization.objects.filter(id=org, sector_group=sector).get()
-
-          user = User(username=username, email=email, org=organization, lvl=lvl)
-          user.password = dbhelper.generate_password_hash(password)
-          user.save()
-
-          send_back = {
-            "user_id": str(user.id),
-            "username": str(user.username),
-            "email": str(user.email),
-            "password": "protected",
-            "org": str(user.org.org_name),
-            "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator"
-          }
-          
-          return jsonify(send_back)
-
-        else:
-          abort(403, {'orgListError': 'No organization or sector list registered'})          
-
-
-      else:
-        abort(401, {'authorizationError': 'Only admin can perform this action !'})
-
-    except KeyError as e:
-      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
-
-    except (mongoengine.errors.NotUniqueError):
-      abort(403, {'AccountError': 'Account already registered'})
-
-
-    except mongoengine.errors.ValidationError:
-      abort(403, {'InvalidRequestBodyError': 'Argument secotor or org suplied by non-id value !'})
-
-  else:
-    abort(400, {'MethodeError': 'Forbidden action'})
-
-# protected endpoint
-@api_endpoint.route('/api/user/me', methods=["GET"])
-@authentication
-def get_me(current_user):
-  return jsonify({
-    "username" : str(current_user.username),
-    "email": str(current_user.email),
-    "password": "*****",
-    "org": str(current_user.org),
-    "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
-    "user_id": str(current_user.id)
-  })
-
-@api_endpoint.route('/api/user', methods=["GET"])
-@authentication
-def user_list(current_user):
-  if request.method == "GET":
-    carrier = []
-    if current_user.lvl == 1:
-      user = User.objects()
-      for x in user:
-        payload = {
-          "user_id": str(x.id),
-          "username": x.username,
-          "password": "protected",
-          "organization": x.org.org_name,
-          "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator"
-        }
-
-        carrier.append(payload)
-
-      return jsonify(carrier)
-    else:
-      abort(401, {'authorizationError': 'Only admin can see user list!'})
-  else:
-    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
-
 @api_endpoint.route('/api/sectoral', methods=["GET", "POST"])
 @authentication
 def sector_list(current_user):
@@ -257,10 +140,177 @@ def org_list(current_user):
         abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
     else:
-      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})    
 
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
+
+@api_endpoint.route('/api/auth/login', methods=["POST"])
+def authorization():
+  if request.method == "POST":
+    try:
+      email = request.get_json()['email']
+      password = request.get_json()['password']
+      
+      user_data = User.objects.get(email=email)
+      passwd_authentication = dbhelper.check_password(user_data.password, password)
+
+      if user_data.is_active:
+        if passwd_authentication:
+          token_exp = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+          token = jwt.encode({
+            "carrier": {
+              "uid": str(user_data.id)
+            },
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1), 
+          }, current_app.config['SECRET_KEY'], algorithm='HS256')
+          return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
+        else:
+          abort(401, {'authorizationError': 'Wrong password'})
+      else:
+        abort(401, {'authorizationError': 'Account terminated !'})
+
+    except KeyError as e:
+      abort(401, {'authorizationError': 'Not sufficient or wrong argument given'})
+
+    except mongoengine.errors.DoesNotExist as e:
+      abort(401, {'authorizationError': 'Email not registered'})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/auth/register', methods=["GET","POST"])
+@authentication
+def register(current_user):
+  if request.method == 'POST':
+    try:
+      if current_user.lvl == 1:
+        is_active = request.get_json()['is_active']
+        username = request.get_json()['username']
+        password = request.get_json()['password']
+        email = request.get_json()['email']
+        sector = request.get_json()['sector']
+        org = request.get_json()['org']
+        lvl = request.get_json()['lvl']
+        
+        org_search = Organization.objects.filter(id=org, sector_group=sector).count()
+
+        if org_search > 0:
+
+          organization = Organization.objects.filter(id=org, sector_group=sector).get()
+          user = User(username=username, email=email, org=organization, lvl=lvl, is_active=bool(is_active))
+          user.password = dbhelper.generate_password_hash(password)
+          user.save()
+
+          send_back = {
+            "user_id": str(user.id),
+            "username": str(user.username),
+            "email": str(user.email),
+            "password": "protected",
+            "org": str(user.org.org_name),
+            "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator",
+            "is_activated": user.is_active
+          }
+          
+          return jsonify(send_back)
+
+        else:
+          abort(403, {'orgListError': 'No organization or sector list registered'})          
+
+      else:
+        abort(401, {'authorizationError': 'Only admin can perform this action !'})
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    except (mongoengine.errors.NotUniqueError):
+      abort(403, {'AccountError': 'Account already registered'})
+
+    except mongoengine.errors.ValidationError:
+      abort(403, {'InvalidRequestBodyError': 'Argument secotor or org suplied by non-id value !'})
+
+  else:
+    abort(400, {'MethodeError': 'Forbidden action'})
+
+# protected endpoint
+@api_endpoint.route('/api/user/me', methods=["GET"])
+@authentication
+def get_me(current_user):
+  return jsonify({
+    "username" : str(current_user.username),
+    "email": str(current_user.email),
+    "password": "*****",
+    "org": str(current_user.org),
+    "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
+    "user_id": str(current_user.id),
+    "is_active": current_user.is_active
+  })
+
+@api_endpoint.route('/api/user', methods=["GET", "PATCH", "DELETE"])
+@authentication
+def user_list(current_user):
+  if request.method == "GET":
+    carrier = []
+    if current_user.lvl == 1:
+      user = User.objects()
+      for x in user:
+        payload = {
+          "user_id": str(x.id),
+          "username": x.username,
+          "password": "protected",
+          "organization": x.org.org_name,
+          "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
+          "is_active": x.is_active
+        }
+
+        carrier.append(payload)
+
+      return jsonify(carrier)
+    else:
+      abort(401, {'authorizationError': 'Only admin can see user list!'})
+
+  elif request.method == "PATCH":
+    if current_user.lvl == 1:
+      try:
+        is_activated = request.get_json()['is_active']
+        raw_password = request.get_json()['password']
+        username = request.get_json()['username']
+        user_id = request.get_json()['user_id']
+        email = request.get_json()['email']
+
+        user = User.objects(id=user_id).first()
+        password = dbhelper.set_password(raw_password)
+
+        user.update(**{"username": username, "password": password, "email": email, "is_active":bool(is_activated)})
+
+        return jsonify({"userUpdated": True})
+
+      except KeyError as e:
+        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    else:
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+
+  elif request.method == "DELETE":
+    if current_user.lvl == 1:
+      try:
+        user_id = request.get_json()['user_id']
+        user = User.objects(id=user_id).first()
+        user.update(**{"is_active": False})
+
+        return jsonify({
+          "user_deactivated": True,
+          "username": user.username
+        })
+
+      except KeyError as e:
+        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    else:
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
 @api_endpoint.route('/api/resource', methods=["GET", "POST", "PATCH", "DELETE"])
 @authentication
@@ -347,7 +397,6 @@ def resource(current_user):
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': '{0} parameter not Found'.format(e)})
 
-
   elif request.method == 'DELETE':
     try:
       req = request.get_json()
@@ -361,18 +410,40 @@ def resource(current_user):
             table_id = request.get_json()['table_id']
 
             table = DynamicData.objects(owner=owner, id=table_id)
-            table.delete()
+            if table.display == 'table':
+              if len(table.table_content) > 0:
+                for x in table.table_content:
+                  os.remove(x.get('file_path'))
 
-            return jsonify({"deleted": True})
+                table.delete()
+                return jsonify({"deleted": True})
+
+              else:
+                table.delete()
+                return jsonify({"deleted": True})
+            else:
+              table.delete()
+              return jsonify({"deleted": True})
 
           else:
             owner = current_user
             table_id = request.get_json()['table_id']
 
-            table = DynamicData.objects(owner=owner, id=table_id)
-            table.delete()
+            table = DynamicData.objects(owner=owner, id=table_id).get()
+            if table.display == 'table':
+              if len(table.table_content) > 0:
+                for x in table.table_content:
+                  os.remove(x.get('file_path'))
 
-            return jsonify({"deleted": True})
+                table.delete()
+                return jsonify({"deleted": True})
+
+              else:
+                table.delete()
+                return jsonify({"deleted": True})
+            else:
+              table.delete()
+              return jsonify({"deleted": True})
 
         except KeyError as e:
           abort(403, {'InvalidRequestBodyError': '{0} parameter not Found'.format(e)})
@@ -390,9 +461,19 @@ def resource(current_user):
           else:
             owner = current_user
             table_id = request.get_json()['table_id']
-            content_id = request.get_json()['content_id']
-            
-            DynamicData.objects(id=table_id).update(pull__table_content={"id": content_id})
+            content_id = request.get_json()['content_id']            
+            content = DynamicData.objects().filter(id=table_id).get()
+
+            if content.display == 'table':
+              for x in content.table_content:
+                if x.get('id') == content_id:
+                  os.remove(x.get('file_path'))
+              
+              DynamicData.objects(id=table_id).update(pull__table_content={"id": content_id})
+
+            else:
+              DynamicData.objects(id=table_id).update(pull__table_content={"id": content_id})
+
             return jsonify({"deleted": True})
 
         except KeyError as e:
@@ -402,11 +483,85 @@ def resource(current_user):
         abort(403, {'DeleteEntityError': 'Cannot determine what to delete'})
 
     except AttributeError as e:
+      print(e)
       abort(403, {'DeleteEntityError': 'Cannot determine what to delete'})
 
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': '{0} parameter not Found'.format(e)})
 
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/resource/upload', methods=["PATCH"])
+@authentication
+def upload(current_user):
+  if request.method == 'PATCH':
+    try:
+      if current_user.lvl == 1:
+        table_id = request.form['table']
+        owner = User.objects(id=request.form['owner']).get()
+        table = DynamicData.objects(id=table_id).get()
+        file = request.files['content']
+
+        if table.display == "table":
+          if allowed_file(file.filename):
+            filename = utils.secure_filename('{0}-{1}.{2}'.format(time.time(), current_user.org.org_name, file.filename.split('.')[1]))
+
+            new_content = {
+              "id": str(dbhelper.BSONObjectID()),
+              "content": filename,
+              "content_name": file.filename.split('.')[0],
+              "file_path": "{0}/{1}".format(current_app.config.get('UPLOAD_FOLDER'), filename),
+              "folder_path": current_app.config.get('UPLOAD_FOLDER'),
+              "file_url": '/api/public/resource/file/{0}'.format(filename),
+              "file_ext": file.filename.split('.')[1]
+            }
+
+            DynamicData.objects(owner=owner, id=table_id).update_one(push__table_content=new_content)
+            file.save(os.path.join(current_app.config.get('UPLOAD_FOLDER'), filename))
+            return jsonify({"fileUploaded": True})
+
+          else:
+            abort(403, {"FileExtNotAllowedError": "File extension is not allowed"})
+
+        else:
+          abort(403, {"TableError": "Table display type is chart instead of table display"})
+
+      else:
+        table_id = request.form['table']
+        owner = User.objects(id=current_user).get()
+        table = DynamicData.objects(id=table_id).get()
+        file = request.files['content']
+
+        if table.display == "table":
+          if allowed_file(file.filename):
+            filename = utils.secure_filename('{0}-{1}.{2}'.format(time.time(), current_user.org.org_name, file.filename.split('.')[1]))
+            
+            new_content = {
+              "id": str(dbhelper.BSONObjectID()),
+              "content": filename,
+              "content_name": file.filename.split('.')[0],
+              "file_path": "{0}/{1}".format(current_app.config.get('UPLOAD_FOLDER'), filename),
+              "folder_path": current_app.config.get('UPLOAD_FOLDER'),
+              "file_url": '/api/public/resource/file/{0}'.format(filename),
+              "file_ext": file.filename.split('.')[1]
+            }
+
+            DynamicData.objects(owner=owner, id=table_id).update_one(push__table_content=new_content)
+            file.save(os.path.join(current_app.config.get('UPLOAD_FOLDER'), filename))
+            return jsonify({"fileUploaded": True})
+
+          else:
+            abort(403, {"FileExtNotAllowedError": "File extension is not allowed"})
+
+        else:
+          abort(403, {"TableError": "Table display type is chart instead of table display"})
+
+    except KeyError:
+      abort(403, {'InvalidRequestBodyError': "Argument 'content' not found in body"})
+
+    except mongoengine.errors.DoesNotExist as e:
+      abort(403, {"InputError": str(e)})
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
@@ -1227,4 +1382,7 @@ def general_res():
             }
             carrier.append(payload)
           return jsonify(carrier)
-      
+
+@api_endpoint.route('/api/public/resource/file/<filename>')
+def file_serve(filename):
+  return send_from_directory(current_app.config.get('UPLOAD_FOLDER'), filename)

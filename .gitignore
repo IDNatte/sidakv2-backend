@@ -18,5 +18,5 @@ db
 db/
 data
 ./db/*.db
-
+./public/upload/*.pdf
 snippet.txt
