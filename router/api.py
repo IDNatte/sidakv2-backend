@@ -529,7 +529,7 @@ def upload(current_user):
 
       else:
         table_id = request.form['table']
-        owner = User.objects(id=current_user).get()
+        owner = User.objects(id=current_user.id).get()
         table = DynamicData.objects(id=table_id).get()
         file = request.files['content']
 
