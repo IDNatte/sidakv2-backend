@@ -409,7 +409,7 @@ def resource(current_user):
             owner = request.get_json()['owner']
             table_id = request.get_json()['table_id']
 
-            table = DynamicData.objects(owner=owner, id=table_id)
+            table = DynamicData.objects(owner=owner, id=table_id).get()
             if table.display == 'table':
               if len(table.table_content) > 0:
                 for x in table.table_content:
