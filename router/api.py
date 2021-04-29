@@ -162,7 +162,7 @@ def authorization():
             "carrier": {
               "uid": str(user_data.id)
             },
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1), 
+            'exp': datetime.datetime.now() + datetime.timedelta(days=1), 
           }, current_app.config['SECRET_KEY'], algorithm='HS256')
           return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
         else:
@@ -318,181 +318,892 @@ def resource(current_user):
   if request.method == 'GET':
     limit = request.args.get('l')
     skip = request.args.get('s')
+    query = request.args.get('q')
 
     if current_user.lvl == 1:
-      if skip and limit:
-        content = DynamicData.objects().skip(int(skip)).limit(int(limit))
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-              "owner_id": str(x.owner.id)
-            }
-          }
+      if query:
+        group_by = request.args.get('group_by')
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+        if group_by == 'display':
+          display_by = request.args.get('display_by')
+          
+          if display_by == 'chart':
+            if skip and limit:
+              content = DynamicData.objects(display=display_by).skip(int(skip)).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
 
-      elif skip and not limit:
-        content = DynamicData.objects().skip(int(skip))
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-              "owner_id": str(x.owner.id)
-            }
-          }
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+            elif skip and not limit:
+              content = DynamicData.objects(display=display_by).skip(int(skip))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
 
-      elif not skip and limit:
-        content = DynamicData.objects().limit(int(limit))
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-              "owner_id": str(x.owner.id)
-            }
-          }
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+            elif not skip and limit:
+              content = DynamicData.objects(display=display_by).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            else:
+              content = DynamicData.objects(display=display_by)
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+          elif display_by == 'table':
+            if skip and limit:
+              content = DynamicData.objects(display=display_by).skip(int(skip)).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif skip and not limit:
+              content = DynamicData.objects(display=display_by).skip(int(skip))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif not skip and limit:
+              content = DynamicData.objects(display=display_by).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            else:
+              content = DynamicData.objects(display=display_by)
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+          else:
+            if skip and limit:
+              content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif skip and not limit:
+              content = DynamicData.objects().skip(int(skip))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif not skip and limit:
+              content = DynamicData.objects().limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            else:
+              content = DynamicData.objects()
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                    "owner_id": str(x.owner.id)
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+        else:
+          if skip and limit:
+            content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                  "owner_id": str(x.owner.id)
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
+
+          elif skip and not limit:
+            content = DynamicData.objects().skip(int(skip))
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                  "owner_id": str(x.owner.id)
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
+
+          elif not skip and limit:
+            content = DynamicData.objects().limit(int(limit))
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                  "owner_id": str(x.owner.id)
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
+
+          else:
+            content = DynamicData.objects()
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                  "owner_id": str(x.owner.id)
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
 
       else:
-        content = DynamicData.objects()
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-              "owner_id": str(x.owner.id)
+        if skip and limit:
+          content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+                "owner_id": str(x.owner.id)
+              }
             }
-          }
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
+
+        elif skip and not limit:
+          content = DynamicData.objects().skip(int(skip))
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+                "owner_id": str(x.owner.id)
+              }
+            }
+
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
+
+        elif not skip and limit:
+          content = DynamicData.objects().limit(int(limit))
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+                "owner_id": str(x.owner.id)
+              }
+            }
+
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
+
+        else:
+          content = DynamicData.objects()
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+                "owner_id": str(x.owner.id)
+              }
+            }
+
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
 
     else:
 
-      if skip and limit:
-        content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-            }
-          }
+      if query:
+        group_by = request.args.get('group_by')
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+        if group_by == 'display':
+          display_by = request.args.get('display_by')
 
-      elif skip and not limit:
-        content = DynamicData.objects(owner=current_user).skip(int(skip))
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-            }
-          }
+          if display_by == 'chart':
+            if skip and limit:
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
 
-      elif not skip and limit:
-        content = DynamicData.objects(owner=current_user).limit(int(limit))
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
-            }
-          }
+            elif skip and not limit:
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif not skip and limit:
+              content = DynamicData.objects(display=display_by, owner=current_user).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            else:
+              content = DynamicData.objects(display=display_by, owner=current_user)
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+          elif display_by == 'table':
+            if skip and limit:
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif skip and not limit:
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif not skip and limit:
+              content = DynamicData.objects(display=display_by, owner=current_user).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            else:
+              content = DynamicData.objects(display=display_by, owner=current_user)
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+          else:
+            if skip and limit:
+              content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif skip and not limit:
+              content = DynamicData.objects(owner=current_user).skip(int(skip))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            elif not skip and limit:
+              content = DynamicData.objects(owner=current_user).limit(int(limit))
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+            else:
+              content = DynamicData.objects(owner=current_user)
+              content_response = []
+              for x in content:
+                c_data = {
+                  "table_id": str(x.id),
+                  "created_on": x.created_on,
+                  "table_name": x.table_name,
+                  "table_description": x.table_desc,
+                  "table_content": x.table_content,
+                  "display": x.display,
+                  "owner" : {
+                    "owner_name": x.owner.username,
+                    "owner_org": x.owner.org.org_name,
+                  }
+                }
+
+                content_response.append(c_data)
+              content_response.sort(key=lambda k: k['created_on'], reverse=True)
+              return jsonify(content_response)
+
+        else:
+          if skip and limit:
+            content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
+
+          elif skip and not limit:
+            content = DynamicData.objects(owner=current_user).skip(int(skip))
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
+
+          elif not skip and limit:
+            content = DynamicData.objects(owner=current_user).limit(int(limit))
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
+
+          else:
+            content = DynamicData.objects(owner=current_user)
+            content_response = []
+            for x in content:
+              c_data = {
+                "table_id": str(x.id),
+                "created_on": x.created_on,
+                "table_name": x.table_name,
+                "table_description": x.table_desc,
+                "table_content": x.table_content,
+                "display": x.display,
+                "owner" : {
+                  "owner_name": x.owner.username,
+                  "owner_org": x.owner.org.org_name,
+                }
+              }
+
+              content_response.append(c_data)
+            content_response.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(content_response)
 
       else:
-        content = DynamicData.objects(owner=current_user)
-        content_response = []
-        for x in content:
-          c_data = {
-            "table_id": str(x.id),
-            "created_on": x.created_on,
-            "table_name": x.table_name,
-            "table_description": x.table_desc,
-            "table_content": x.table_content,
-            "display": x.display,
-            "owner" : {
-              "owner_name": x.owner.username,
-              "owner_org": x.owner.org.org_name,
+        if skip and limit:
+          content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+              }
             }
-          }
 
-          content_response.append(c_data)
-        content_response.sort(key=lambda k: k['created_on'], reverse=True)
-        return jsonify(content_response)
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
+
+        elif skip and not limit:
+          content = DynamicData.objects(owner=current_user).skip(int(skip))
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+              }
+            }
+
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
+
+        elif not skip and limit:
+          content = DynamicData.objects(owner=current_user).limit(int(limit))
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+              }
+            }
+
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
+
+        else:
+          content = DynamicData.objects(owner=current_user)
+          content_response = []
+          for x in content:
+            c_data = {
+              "table_id": str(x.id),
+              "created_on": x.created_on,
+              "table_name": x.table_name,
+              "table_description": x.table_desc,
+              "table_content": x.table_content,
+              "display": x.display,
+              "owner" : {
+                "owner_name": x.owner.username,
+                "owner_org": x.owner.org.org_name,
+              }
+            }
+
+            content_response.append(c_data)
+          content_response.sort(key=lambda k: k['created_on'], reverse=True)
+          return jsonify(content_response)
 
   elif request.method == 'POST':
     try:
