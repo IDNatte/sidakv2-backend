@@ -17,7 +17,7 @@ class User(Document):
   lvl = IntField(required=True)
 
 class DynamicData(DynamicDocument):
-  created_on = DateTimeField(default=datetime.now())
+  created_on = DateTimeField(default=datetime.now)
   owner = ReferenceField(User)
   table_name = StringField(required=True, unique=True)
   table_desc = StringField(required=True)

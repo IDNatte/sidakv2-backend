@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
 from model import User, DynamicData, Organization, SectoralGroup, dbhelper
-from helper import authentication, allowed_file
+from helper import authentication, allowed_file, list_key
+from operator import itemgetter
 from werkzeug import utils
 import mongoengine
 import datetime
@@ -316,46 +317,183 @@ def user_list(current_user):
 @authentication
 def resource(current_user):
   if request.method == 'GET':
+    limit = request.args.get('l')
+    skip = request.args.get('s')
+
     if current_user.lvl == 1:
-      content = DynamicData.objects()
-      content_response = []
-      for x in content:
-        c_data = {
-          "table_id": str(x.id),
-          "created_on": x.created_on,
-          "table_name": x.table_name,
-          "table_description": x.table_desc,
-          "table_content": x.table_content,
-          "display": x.display,
-          "owner" : {
-            "owner_name": x.owner.username,
-            "owner_org": x.owner.org.org_name,
-            "owner_id": str(x.owner.id)
+      if skip and limit:
+        content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+              "owner_id": str(x.owner.id)
+            }
           }
-        }
 
-        content_response.append(c_data)
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
 
-      return jsonify(content_response)
+      elif skip and not limit:
+        content = DynamicData.objects().skip(int(skip))
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+              "owner_id": str(x.owner.id)
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
+
+      elif not skip and limit:
+        content = DynamicData.objects().limit(int(limit))
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+              "owner_id": str(x.owner.id)
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
+
+      else:
+        content = DynamicData.objects()
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+              "owner_id": str(x.owner.id)
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
+
     else:
-      content = DynamicData.objects(owner=current_user)
-      content_response = []
-      for x in content:
-        c_data = {
-          "table_id": str(x.id),
-          "created_on": x.created_on,
-          "table_name": x.table_name,
-          "table_description": x.table_desc,
-          "table_content": x.table_content,
-          "display": x.display,
-          "owner" : {
-            "owner_name": x.owner.username,
-            "owner_org": x.owner.org.org_name,
-          }
-        }
 
-        content_response.append(c_data)
-      return jsonify(content_response)
+      if skip and limit:
+        content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
+
+      elif skip and not limit:
+        content = DynamicData.objects(owner=current_user).skip(int(skip))
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
+
+      elif not skip and limit:
+        content = DynamicData.objects(owner=current_user).limit(int(limit))
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
+
+      else:
+        content = DynamicData.objects(owner=current_user)
+        content_response = []
+        for x in content:
+          c_data = {
+            "table_id": str(x.id),
+            "created_on": x.created_on,
+            "table_name": x.table_name,
+            "table_description": x.table_desc,
+            "table_content": x.table_content,
+            "display": x.display,
+            "owner" : {
+              "owner_name": x.owner.username,
+              "owner_org": x.owner.org.org_name,
+            }
+          }
+
+          content_response.append(c_data)
+        content_response.sort(key=lambda k: k['created_on'], reverse=True)
+        return jsonify(content_response)
 
   elif request.method == 'POST':
     try:
@@ -566,6 +704,15 @@ def upload(current_user):
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
 # general endpoint
+@api_endpoint.route('/api/public/count/<item>')
+def general_count(item):
+  if item == 'resource':
+    resource = DynamicData.objects().count()
+    return jsonify({"item": resource})
+
+  else:
+    abort(400, {"CountError": "Missing direction on what to count"})
+
 @api_endpoint.route('/api/public/sectoral')
 def general_sect():
   carrier = []
@@ -612,6 +759,7 @@ def general_res():
       for x in table:
         payload = {
           "table_name": x.table_name,
+          "created_on": x.created_on,
           "table_content": x.table_content,
           "display": x.display,
           "table_owner": {
@@ -621,6 +769,8 @@ def general_res():
           }
         }
         carrier.append(payload)
+
+      carrier.sort(key=lambda k: k['created_on'], reverse=True)
       return jsonify(carrier)
 
     elif skip and not limit:
@@ -630,6 +780,7 @@ def general_res():
       for x in table:
         payload = {
           "table_name": x.table_name,
+          "created_on": x.created_on,
           "table_content": x.table_content,
           "display": x.display,
           "table_owner": {
@@ -639,6 +790,7 @@ def general_res():
           }
         }
         carrier.append(payload)
+      carrier.sort(key=lambda k: k['created_on'], reverse=True)
       return jsonify(carrier)
 
     elif not skip and limit:
@@ -648,6 +800,7 @@ def general_res():
       for x in table:
         payload = {
           "table_name": x.table_name,
+          "created_on": x.created_on,
           "table_content": x.table_content,
           "display": x.display,
           "table_owner": {
@@ -657,6 +810,7 @@ def general_res():
           }
         }
         carrier.append(payload)
+      carrier.sort(key=lambda k: k['created_on'], reverse=True)
       return jsonify(carrier)
 
     else:
@@ -666,6 +820,7 @@ def general_res():
       for x in table:
         payload = {
           "table_name": x.table_name,
+          "created_on": x.created_on,
           "table_content": x.table_content,
           "display": x.display,
           "table_owner": {
@@ -675,6 +830,7 @@ def general_res():
           }
         }
         carrier.append(payload)
+      carrier.sort(key=lambda k: k['created_on'], reverse=True)
       return jsonify(carrier)
 
   elif query:
@@ -696,6 +852,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -705,6 +862,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -714,6 +872,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -723,6 +882,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       elif not limit and skip:
@@ -736,6 +896,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -745,6 +906,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -754,6 +916,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -763,6 +926,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       elif limit and not skip:
@@ -776,6 +940,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -785,6 +950,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -794,6 +960,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -803,6 +970,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       else:
@@ -816,6 +984,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -825,6 +994,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -834,6 +1004,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -843,6 +1014,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
     elif group_by == 'display':
@@ -856,6 +1028,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -865,6 +1038,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         elif display == 'table':
@@ -874,6 +1048,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -883,6 +1058,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -892,6 +1068,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -901,6 +1078,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       elif skip and not limit:
@@ -911,6 +1089,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -920,6 +1099,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         elif display == 'table':
@@ -929,6 +1109,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -938,6 +1119,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -947,6 +1129,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -956,6 +1139,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       elif not skip and limit:
@@ -966,6 +1150,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -975,6 +1160,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         elif display == 'table':
@@ -984,6 +1170,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -993,6 +1180,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1002,6 +1190,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1011,6 +1200,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       else:
@@ -1021,6 +1211,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1030,6 +1221,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         elif display == 'table':
@@ -1039,6 +1231,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1048,6 +1241,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1057,6 +1251,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1066,6 +1261,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
     elif group_by == 'organization':
@@ -1081,6 +1277,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1090,6 +1287,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1099,6 +1297,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1108,6 +1307,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
       
       elif not limit and skip:
@@ -1120,6 +1320,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1129,6 +1330,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1138,6 +1340,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1147,6 +1350,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
       
       elif limit and not skip:
@@ -1159,6 +1363,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1168,6 +1373,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1177,6 +1383,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1186,6 +1393,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       else:
@@ -1198,6 +1406,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1207,6 +1416,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1216,6 +1426,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1225,6 +1436,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
     elif group_by == "user":
@@ -1239,6 +1451,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1248,6 +1461,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1257,6 +1471,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1266,6 +1481,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
 
@@ -1278,6 +1494,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1287,6 +1504,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1305,6 +1523,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       elif not limit and skip:
@@ -1316,6 +1535,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1325,6 +1545,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1334,6 +1555,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1343,6 +1565,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
       else:
@@ -1354,6 +1577,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1363,6 +1587,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
         else:
@@ -1372,6 +1597,7 @@ def general_res():
           for x in data:
             payload = {
               "table_name": x.table_name,
+              "created_on": x.created_on,
               "table_content": x.table_content,
               "display": x.display,
               "table_owner": {
@@ -1381,6 +1607,7 @@ def general_res():
               }
             }
             carrier.append(payload)
+          carrier.sort(key=lambda k: k['created_on'], reverse=True)
           return jsonify(carrier)
 
 @api_endpoint.route('/api/public/resource/file/<filename>')

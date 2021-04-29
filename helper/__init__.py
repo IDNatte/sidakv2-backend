@@ -28,6 +28,7 @@ def authentication(f):
       abort(401, {'authorizationError': 'Invalid authorization key'})
 
     except KeyError as e:
+      print(e)
       abort(401, {'authorizationError': 'Invalid authorization header'})
 
     except errors.DoesNotExist as e:
@@ -37,3 +38,6 @@ def authentication(f):
 
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def list_key(e):
+  return e['created_on']
