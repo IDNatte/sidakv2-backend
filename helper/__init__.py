@@ -38,6 +38,3 @@ def authentication(f):
 
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def list_key(e):
-  return e['created_on']
