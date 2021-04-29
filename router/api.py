@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
 from model import User, DynamicData, Organization, SectoralGroup, dbhelper
-from helper import authentication, allowed_file, list_key
-from operator import itemgetter
+from helper import authentication, allowed_file
 from werkzeug import utils
 import mongoengine
 import datetime
