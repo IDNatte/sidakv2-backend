@@ -1846,7 +1846,7 @@ def general_res():
       elif not skip and limit:
         if display == 'chart':
           carrier = []
-          data = DynamicData.objects(display=display).limit(int(limit)).order('-created_on')
+          data = DynamicData.objects(display=display).order('-created_on').limit(int(limit))
 
           for x in data:
             payload = {
