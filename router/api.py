@@ -773,7 +773,6 @@ def resource(current_user):
           return jsonify(content_response)
 
     else:
-
       if query:
         group_by = request.args.get('group_by')
 
@@ -1414,14 +1413,6 @@ def upload(current_user):
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
 # general endpoint
-@api_endpoint.route('/api/public/count/<item>')
-def general_count(item):
-  if item == 'resource':
-    resource = DynamicData.objects().count()
-    return jsonify({"item": resource})
-
-  else:
-    abort(400, {"CountError": "Missing direction on what to count"})
 
 @api_endpoint.route('/api/public/sectoral')
 def general_sect():
@@ -2323,3 +2314,143 @@ def general_res():
 @api_endpoint.route('/api/public/resource/file/<filename>')
 def file_serve(filename):
   return send_from_directory(current_app.config.get('UPLOAD_FOLDER'), filename)
+
+# helper endpoint
+@api_endpoint.route('/api/public/count/<item>')
+def general_count(item):
+  if item == 'resource':
+    group_by = request.args.get('group_by')
+
+    if group_by == 'display':
+      display_by = request.args.get('display_by')
+
+      if display_by == 'chart':
+        resource = DynamicData.objects(display=display_by).count()
+        return jsonify({"item": resource})
+
+      elif display_by == 'table':
+        resource = DynamicData.objects(display=display_by).count()
+        return jsonify({"item": resource})
+
+      else:
+        resource = DynamicData.objects().count()
+        return jsonify({"item": resource})
+
+
+    elif group_by == 'sector':
+      sector = request.args.get('sector')
+      display = request.args.get('display')
+
+      if display == 'chart':
+        if sector:
+          sector = SectoralGroup.objects(sector_name__iexact=sector)
+          org = Organization.objects(sector_group__in=sector).all()
+          owner = User.objects(org__in=org).all()
+          resource = DynamicData.objects(owner__in=owner, display=display).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects(display=display).count()
+          return jsonify({"item": resource})
+
+      elif display == 'table':
+        if sector:
+          sector = SectoralGroup.objects(sector_name__iexact=sector)
+          org = Organization.objects(sector_group__in=sector).all()
+          owner = User.objects(org__in=org).all()
+          resource = DynamicData.objects(owner__in=owner, display=display).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects(display=display).count()
+          return jsonify({"item": resource})
+
+      else:
+        if sector:
+          sector = SectoralGroup.objects(sector_name__iexact=sector)
+          org = Organization.objects(sector_group__in=sector).all()
+          owner = User.objects(org__in=org).all()
+          resource = DynamicData.objects(owner__in=owner).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects().count()
+          return jsonify({"item": resource})
+
+    elif group_by == 'organization':
+      org_name = request.args.get('org')
+      display = request.args.get('display')
+
+      if display == 'chart':
+        if org_name:
+          org = Organization.objects(org_name__iexact=org_name)
+          owner = User.objects(org__in=org).all()
+          resource = DynamicData.objects(owner__in=owner, display=display).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects(display=display).count()
+          return jsonify({"item": resource})
+
+      elif display == 'table':
+        if org_name:
+          org = Organization.objects(org_name__iexact=org_name)
+          owner = User.objects(org__in=org).all()
+          resource = DynamicData.objects(owner__in=owner, display=display).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects(display=display).count()
+          return jsonify({"item": resource})
+
+      else:
+        if org_name:
+          org = Organization.objects(org_name__iexact=org_name)
+          owner = User.objects(org__in=org).all()
+          resource = DynamicData.objects(owner__in=owner).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects().count()
+          return jsonify({"item": resource})
+
+    elif group_by == 'user':
+      username = request.args.get('user')
+      display = request.args.get('display')
+
+      if display == 'chart':
+        if username:
+          owner = User.objects(username__iexact=username)
+          resource = DynamicData.objects(owner__in=owner, display=display).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects(display=display).count()
+          return jsonify({"item": resource})
+
+      elif display == 'table':
+        if username:
+          owner = User.objects(username__iexact=username)
+          resource = DynamicData.objects(owner__in=owner, display=display).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects(display=display).count()
+          return jsonify({"item": resource})
+
+      else:
+        if username:
+          owner = User.objects(username__iexact=username)
+          resource = DynamicData.objects(owner__in=owner).count()
+          return jsonify({"item": resource})
+
+        else:
+          resource = DynamicData.objects().count()
+          return jsonify({"item": resource})
+
+    else:
+      resource = DynamicData.objects().count()
+      return jsonify({"item": resource})
+
+  else:
+    abort(400, {"CountError": "Missing direction on what to count"})
