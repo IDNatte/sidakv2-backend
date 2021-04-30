@@ -329,7 +329,7 @@ def resource(current_user):
           
           if display_by == 'chart':
             if skip and limit:
-              content = DynamicData.objects(display=display_by).skip(int(skip)).limit(int(limit))
+              content = DynamicData.objects(display=display_by).skip(int(skip)).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -351,7 +351,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif skip and not limit:
-              content = DynamicData.objects(display=display_by).skip(int(skip))
+              content = DynamicData.objects(display=display_by).skip(int(skip)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -373,7 +373,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif not skip and limit:
-              content = DynamicData.objects(display=display_by).limit(int(limit))
+              content = DynamicData.objects(display=display_by).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -395,7 +395,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             else:
-              content = DynamicData.objects(display=display_by)
+              content = DynamicData.objects(display=display_by).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -418,7 +418,7 @@ def resource(current_user):
 
           elif display_by == 'table':
             if skip and limit:
-              content = DynamicData.objects(display=display_by).skip(int(skip)).limit(int(limit))
+              content = DynamicData.objects(display=display_by).skip(int(skip)).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -440,7 +440,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif skip and not limit:
-              content = DynamicData.objects(display=display_by).skip(int(skip))
+              content = DynamicData.objects(display=display_by).skip(int(skip)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -462,7 +462,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif not skip and limit:
-              content = DynamicData.objects(display=display_by).limit(int(limit))
+              content = DynamicData.objects(display=display_by).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -484,7 +484,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             else:
-              content = DynamicData.objects(display=display_by)
+              content = DynamicData.objects(display=display_by).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -507,7 +507,7 @@ def resource(current_user):
 
           else:
             if skip and limit:
-              content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+              content = DynamicData.objects().skip(int(skip)).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -529,7 +529,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif skip and not limit:
-              content = DynamicData.objects().skip(int(skip))
+              content = DynamicData.objects().skip(int(skip)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -551,7 +551,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif not skip and limit:
-              content = DynamicData.objects().limit(int(limit))
+              content = DynamicData.objects().limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -573,7 +573,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             else:
-              content = DynamicData.objects()
+              content = DynamicData.objects().order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -596,7 +596,7 @@ def resource(current_user):
 
         else:
           if skip and limit:
-            content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+            content = DynamicData.objects().skip(int(skip)).limit(int(limit)).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -618,7 +618,7 @@ def resource(current_user):
             return jsonify(content_response)
 
           elif skip and not limit:
-            content = DynamicData.objects().skip(int(skip))
+            content = DynamicData.objects().skip(int(skip)).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -640,7 +640,7 @@ def resource(current_user):
             return jsonify(content_response)
 
           elif not skip and limit:
-            content = DynamicData.objects().limit(int(limit))
+            content = DynamicData.objects().limit(int(limit)).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -662,7 +662,7 @@ def resource(current_user):
             return jsonify(content_response)
 
           else:
-            content = DynamicData.objects()
+            content = DynamicData.objects().order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -685,7 +685,7 @@ def resource(current_user):
 
       else:
         if skip and limit:
-          content = DynamicData.objects().skip(int(skip)).limit(int(limit))
+          content = DynamicData.objects().skip(int(skip)).limit(int(limit)).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -707,7 +707,7 @@ def resource(current_user):
           return jsonify(content_response)
 
         elif skip and not limit:
-          content = DynamicData.objects().skip(int(skip))
+          content = DynamicData.objects().skip(int(skip)).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -729,7 +729,7 @@ def resource(current_user):
           return jsonify(content_response)
 
         elif not skip and limit:
-          content = DynamicData.objects().limit(int(limit))
+          content = DynamicData.objects().limit(int(limit)).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -751,7 +751,7 @@ def resource(current_user):
           return jsonify(content_response)
 
         else:
-          content = DynamicData.objects()
+          content = DynamicData.objects().order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -781,7 +781,7 @@ def resource(current_user):
 
           if display_by == 'chart':
             if skip and limit:
-              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).limit(int(limit))
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -802,7 +802,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif skip and not limit:
-              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip))
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -823,7 +823,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif not skip and limit:
-              content = DynamicData.objects(display=display_by, owner=current_user).limit(int(limit))
+              content = DynamicData.objects(display=display_by, owner=current_user).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -844,7 +844,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             else:
-              content = DynamicData.objects(display=display_by, owner=current_user)
+              content = DynamicData.objects(display=display_by, owner=current_user).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -866,7 +866,7 @@ def resource(current_user):
 
           elif display_by == 'table':
             if skip and limit:
-              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).limit(int(limit))
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -887,7 +887,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif skip and not limit:
-              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip))
+              content = DynamicData.objects(display=display_by, owner=current_user).skip(int(skip)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -908,7 +908,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif not skip and limit:
-              content = DynamicData.objects(display=display_by, owner=current_user).limit(int(limit))
+              content = DynamicData.objects(display=display_by, owner=current_user).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -929,7 +929,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             else:
-              content = DynamicData.objects(display=display_by, owner=current_user)
+              content = DynamicData.objects(display=display_by, owner=current_user).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -951,7 +951,7 @@ def resource(current_user):
 
           else:
             if skip and limit:
-              content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+              content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -972,7 +972,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif skip and not limit:
-              content = DynamicData.objects(owner=current_user).skip(int(skip))
+              content = DynamicData.objects(owner=current_user).skip(int(skip)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -993,7 +993,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             elif not skip and limit:
-              content = DynamicData.objects(owner=current_user).limit(int(limit))
+              content = DynamicData.objects(owner=current_user).limit(int(limit)).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -1014,7 +1014,7 @@ def resource(current_user):
               return jsonify(content_response)
 
             else:
-              content = DynamicData.objects(owner=current_user)
+              content = DynamicData.objects(owner=current_user).order('-created_on')
               content_response = []
               for x in content:
                 c_data = {
@@ -1036,7 +1036,7 @@ def resource(current_user):
 
         else:
           if skip and limit:
-            content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+            content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit)).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -1057,7 +1057,7 @@ def resource(current_user):
             return jsonify(content_response)
 
           elif skip and not limit:
-            content = DynamicData.objects(owner=current_user).skip(int(skip))
+            content = DynamicData.objects(owner=current_user).skip(int(skip)).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -1078,7 +1078,7 @@ def resource(current_user):
             return jsonify(content_response)
 
           elif not skip and limit:
-            content = DynamicData.objects(owner=current_user).limit(int(limit))
+            content = DynamicData.objects(owner=current_user).limit(int(limit)).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -1099,7 +1099,7 @@ def resource(current_user):
             return jsonify(content_response)
 
           else:
-            content = DynamicData.objects(owner=current_user)
+            content = DynamicData.objects(owner=current_user).order('-created_on')
             content_response = []
             for x in content:
               c_data = {
@@ -1121,7 +1121,7 @@ def resource(current_user):
 
       else:
         if skip and limit:
-          content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit))
+          content = DynamicData.objects(owner=current_user).skip(int(skip)).limit(int(limit)).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -1142,7 +1142,7 @@ def resource(current_user):
           return jsonify(content_response)
 
         elif skip and not limit:
-          content = DynamicData.objects(owner=current_user).skip(int(skip))
+          content = DynamicData.objects(owner=current_user).skip(int(skip)).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -1163,7 +1163,7 @@ def resource(current_user):
           return jsonify(content_response)
 
         elif not skip and limit:
-          content = DynamicData.objects(owner=current_user).limit(int(limit))
+          content = DynamicData.objects(owner=current_user).limit(int(limit)).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -1184,7 +1184,7 @@ def resource(current_user):
           return jsonify(content_response)
 
         else:
-          content = DynamicData.objects(owner=current_user)
+          content = DynamicData.objects(owner=current_user).order('-created_on')
           content_response = []
           for x in content:
             c_data = {
@@ -1455,7 +1455,7 @@ def general_res():
 
     if skip and limit:
       carrier = []
-      table = DynamicData.objects().limit(int(limit)).skip(int(skip))
+      table = DynamicData.objects().limit(int(limit)).skip(int(skip)).order('-created_on')
 
       for x in table:
         payload = {
@@ -1476,7 +1476,7 @@ def general_res():
 
     elif skip and not limit:
       carrier = []
-      table = DynamicData.objects().skip(int(skip))
+      table = DynamicData.objects().skip(int(skip)).order('-created_on')
 
       for x in table:
         payload = {
@@ -1496,7 +1496,7 @@ def general_res():
 
     elif not skip and limit:
       carrier = []
-      table = DynamicData.objects().limit(int(limit))
+      table = DynamicData.objects().limit(int(limit)).order('-created_on')
 
       for x in table:
         payload = {
@@ -1516,7 +1516,7 @@ def general_res():
 
     else:
       carrier = []
-      table = DynamicData.objects()
+      table = DynamicData.objects().order('-created_on')
 
       for x in table:
         payload = {
@@ -1548,7 +1548,7 @@ def general_res():
           sector = SectoralGroup.objects(sector_name__iexact=sector_name)
           org = Organization.objects(sector_group__in=sector).all()
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all()
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -1568,7 +1568,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit)).skip(int(skip))
+          data = DynamicData.objects().limit(int(limit)).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1592,7 +1592,7 @@ def general_res():
           sector = SectoralGroup.objects(sector_name__iexact=sector_name)
           org = Organization.objects(sector_group__in=sector).all()
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all()
+          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -1612,7 +1612,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().skip(int(skip))
+          data = DynamicData.objects().skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1636,7 +1636,7 @@ def general_res():
           sector = SectoralGroup.objects(sector_name__iexact=sector_name)
           org = Organization.objects(sector_group__in=sector).all()
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all()
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -1656,7 +1656,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit))
+          data = DynamicData.objects().limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1680,7 +1680,7 @@ def general_res():
           sector = SectoralGroup.objects(sector_name__iexact=sector_name)
           org = Organization.objects(sector_group__in=sector).all()
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).all()
+          data = DynamicData.objects(owner__in=owner).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -1700,7 +1700,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects()
+          data = DynamicData.objects().order('-created_on')
 
           for x in data:
             payload = {
@@ -1724,7 +1724,7 @@ def general_res():
       if limit and skip:
         if display == 'chart':
           carrier = []
-          data = DynamicData.objects(display=display).limit(int(limit)).skip(int(skip))
+          data = DynamicData.objects(display=display).limit(int(limit)).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1744,7 +1744,7 @@ def general_res():
 
         elif display == 'table':
           carrier = []
-          data = DynamicData.objects(display=display).limit(int(limit)).skip(int(skip))
+          data = DynamicData.objects(display=display).limit(int(limit)).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1764,7 +1764,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit)).skip(int(skip))
+          data = DynamicData.objects().limit(int(limit)).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1785,7 +1785,7 @@ def general_res():
       elif skip and not limit:
         if display == 'chart':
           carrier = []
-          data = DynamicData.objects(display=display).skip(int(skip))
+          data = DynamicData.objects(display=display).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1805,7 +1805,7 @@ def general_res():
 
         elif display == 'table':
           carrier = []
-          data = DynamicData.objects(display=display).skip(int(skip))
+          data = DynamicData.objects(display=display).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1825,7 +1825,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().skip(int(skip))
+          data = DynamicData.objects().skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1846,7 +1846,7 @@ def general_res():
       elif not skip and limit:
         if display == 'chart':
           carrier = []
-          data = DynamicData.objects(display=display).limit(int(limit))
+          data = DynamicData.objects(display=display).limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1866,7 +1866,7 @@ def general_res():
 
         elif display == 'table':
           carrier = []
-          data = DynamicData.objects(display=display).limit(int(limit))
+          data = DynamicData.objects(display=display).limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1886,7 +1886,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit))
+          data = DynamicData.objects().limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
@@ -1927,7 +1927,7 @@ def general_res():
 
         elif display == 'table':
           carrier = []
-          data = DynamicData.objects(display=display)
+          data = DynamicData.objects(display=display).order('-created_on')
 
           for x in data:
             payload = {
@@ -1947,7 +1947,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects()
+          data = DynamicData.objects().order('-created_on')
 
           for x in data:
             payload = {
@@ -1973,7 +1973,7 @@ def general_res():
           carrier = []
           org = Organization.objects(org_name__iexact=org_name)
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all()
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -1993,7 +1993,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit)).skip(int(skip))
+          data = DynamicData.objects().limit(int(limit)).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -2016,7 +2016,7 @@ def general_res():
           carrier = []
           org = Organization.objects(org_name__iexact=org_name)
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all()
+          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2036,7 +2036,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().skip(int(skip))
+          data = DynamicData.objects().skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -2059,7 +2059,7 @@ def general_res():
           carrier = []
           org = Organization.objects(org_name__iexact=org_name)
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all()
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2079,7 +2079,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit))
+          data = DynamicData.objects().limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
@@ -2102,7 +2102,7 @@ def general_res():
           carrier = []
           org = Organization.objects(org_name__iexact=org_name)
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).all()
+          data = DynamicData.objects(owner__in=owner).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2122,7 +2122,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects()
+          data = DynamicData.objects().order('-created_on')
 
           for x in data:
             payload = {
@@ -2147,7 +2147,7 @@ def general_res():
         if username:
           carrier = []
           owner = User.objects(username__iexact=username)
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all()
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2167,7 +2167,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit)).skip(int(skip))
+          data = DynamicData.objects().limit(int(limit)).skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -2190,7 +2190,7 @@ def general_res():
         if username:
           carrier = []
           owner = User.objects(username__iexact=username)
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all()
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2210,7 +2210,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().limit(int(limit))
+          data = DynamicData.objects().limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
@@ -2231,7 +2231,7 @@ def general_res():
         if username:
           carrier = []
           owner = User.objects(username__iexact=username)
-          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all()
+          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2251,7 +2251,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects().skip(int(skip))
+          data = DynamicData.objects().skip(int(skip)).order('-created_on')
 
           for x in data:
             payload = {
@@ -2273,7 +2273,7 @@ def general_res():
         if username:
           carrier = []
           owner = User.objects(username__iexact=username)
-          data = DynamicData.objects(owner__in=owner).all()
+          data = DynamicData.objects(owner__in=owner).all().order('-created_on')
 
           for x in data:
             payload = {
@@ -2293,7 +2293,7 @@ def general_res():
 
         else:
           carrier = []
-          data = DynamicData.objects()
+          data = DynamicData.objects().order('-created_on')
 
           for x in data:
             payload = {
