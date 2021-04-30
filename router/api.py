@@ -1636,7 +1636,7 @@ def general_res():
           sector = SectoralGroup.objects(sector_name__iexact=sector_name)
           org = Organization.objects(sector_group__in=sector).all()
           owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all().order('-created_on')
+          data = DynamicData.objects(owner__in=owner).limit(int(limit)).order('-created_on')
 
           for x in data:
             payload = {
