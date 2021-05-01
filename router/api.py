@@ -1967,178 +1967,526 @@ def general_res():
 
     elif group_by == 'organization':
       org_name = request.args.get('org')
+      display = request.args.get('display')
 
-      if limit and skip:
-        if org_name:
-          carrier = []
-          org = Organization.objects(org_name__iexact=org_name)
-          owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all().order_by('-created_on')
+      if display == 'chart':
+        if limit and skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).limit(int(limit)).skip(int(skip)).all().order_by('-created_on')
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).limit(int(limit)).skip(int(skip)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+        
+        elif not limit and skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).skip(int(skip)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).skip(int(skip)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+        
+        elif limit and not skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).limit(int(limit)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).limit(int(limit)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
         else:
-          carrier = []
-          data = DynamicData.objects().limit(int(limit)).skip(int(skip)).order_by('-created_on')
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).all().order_by('-created_on')
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
-      
-      elif not limit and skip:
-        if org_name:
-          carrier = []
-          org = Organization.objects(org_name__iexact=org_name)
-          owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).skip(int(skip)).all().order_by('-created_on')
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+      elif display == 'table':
+        if limit and skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).limit(int(limit)).skip(int(skip)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).limit(int(limit)).skip(int(skip)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+        
+        elif not limit and skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).skip(int(skip)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).skip(int(skip)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+        
+        elif limit and not skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).limit(int(limit)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).limit(int(limit)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
         else:
-          carrier = []
-          data = DynamicData.objects().skip(int(skip)).order_by('-created_on')
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner, display=display).all().order_by('-created_on')
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
-      
-      elif limit and not skip:
-        if org_name:
-          carrier = []
-          org = Organization.objects(org_name__iexact=org_name)
-          owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).limit(int(limit)).all().order_by('-created_on')
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+          else:
+            carrier = []
+            data = DynamicData.objects(display=display).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
-
-        else:
-          carrier = []
-          data = DynamicData.objects().limit(int(limit)).order_by('-created_on')
-
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
-              }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
       else:
-        if org_name:
-          carrier = []
-          org = Organization.objects(org_name__iexact=org_name)
-          owner = User.objects(org__in=org).all()
-          data = DynamicData.objects(owner__in=owner).all().order_by('-created_on')
+        if limit and skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner).limit(int(limit)).skip(int(skip)).all().order_by('-created_on')
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects().limit(int(limit)).skip(int(skip)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+        
+        elif not limit and skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner).skip(int(skip)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects().skip(int(skip)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+        
+        elif limit and not skip:
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner).limit(int(limit)).all().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects().limit(int(limit)).order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
         else:
-          carrier = []
-          data = DynamicData.objects().order_by('-created_on')
+          if org_name:
+            carrier = []
+            org = Organization.objects(org_name__iexact=org_name)
+            owner = User.objects(org__in=org).all()
+            data = DynamicData.objects(owner__in=owner).all().order_by('-created_on')
 
-          for x in data:
-            payload = {
-              "table_name": x.table_name,
-              "created_on": x.created_on,
-              "table_content": x.table_content,
-              "display": x.display,
-              "table_owner": {
-                "username": x.owner.username,
-                "organization": x.owner.org.org_name,
-                "sector": x.owner.org.sector_group.sector_name
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
               }
-            }
-            carrier.append(payload)
-          carrier.sort(key=lambda k: k['created_on'], reverse=True)
-          return jsonify(carrier)
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
+
+          else:
+            carrier = []
+            data = DynamicData.objects().order_by('-created_on')
+
+            for x in data:
+              payload = {
+                "table_name": x.table_name,
+                "created_on": x.created_on,
+                "table_content": x.table_content,
+                "display": x.display,
+                "table_owner": {
+                  "username": x.owner.username,
+                  "organization": x.owner.org.org_name,
+                  "sector": x.owner.org.sector_group.sector_name
+                }
+              }
+              carrier.append(payload)
+            carrier.sort(key=lambda k: k['created_on'], reverse=True)
+            return jsonify(carrier)
 
     elif group_by == "user":
       username = request.args.get('user')
@@ -2647,6 +2995,26 @@ def general_res():
               carrier.append(payload)
             carrier.sort(key=lambda k: k['created_on'], reverse=True)
             return jsonify(carrier)
+
+@api_endpoint.route('/api/public/resource/table/<table_name>')
+def table_detail(table_name):
+  try:
+    table = DynamicData.objects(table_name__iexact=table_name).get()
+    return jsonify({
+      "table_name": table.table_name,
+      "created_on": table.created_on,
+      "table_content": table.table_content,
+      "display": table.display,
+      "table_owner": {
+        "username": table.owner.username,
+        "organization": table.owner.org.org_name,
+        "sector": table.owner.org.sector_group.sector_name
+      }
+    })
+
+  except mongoengine.errors.DoesNotExist:
+    return jsonify([])
+
 
 @api_endpoint.route('/api/public/resource/file/<filename>')
 def file_serve(filename):
