@@ -2998,22 +2998,18 @@ def general_res():
 
 @api_endpoint.route('/api/public/resource/table/<table_name>')
 def table_detail(table_name):
-  try:
-    table = DynamicData.objects(table_name__iexact=table_name).get()
-    return jsonify({
-      "table_name": table.table_name,
-      "created_on": table.created_on,
-      "table_content": table.table_content,
-      "display": table.display,
-      "table_owner": {
-        "username": table.owner.username,
-        "organization": table.owner.org.org_name,
-        "sector": table.owner.org.sector_group.sector_name
-      }
-    })
-
-  except mongoengine.errors.DoesNotExist:
-    return jsonify([])
+  table = DynamicData.objects(table_name__iexact=table_name).get()
+  return jsonify({
+    "table_name": table.table_name,
+    "created_on": table.created_on,
+    "table_content": table.table_content,
+    "display": table.display,
+    "table_owner": {
+      "username": table.owner.username,
+      "organization": table.owner.org.org_name,
+      "sector": table.owner.org.sector_group.sector_name
+    }
+  })
 
 
 @api_endpoint.route('/api/public/resource/file/<filename>')
