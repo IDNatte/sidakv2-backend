@@ -1459,6 +1459,7 @@ def general_res():
 
       for x in table:
         payload = {
+          "table_id": x.public_id,
           "table_name": x.table_name,
           "created_on": x.created_on,
           "table_content": x.table_content,
@@ -1480,6 +1481,7 @@ def general_res():
 
       for x in table:
         payload = {
+          "table_id": x.public_id,
           "table_name": x.table_name,
           "created_on": x.created_on,
           "table_content": x.table_content,
@@ -1500,6 +1502,7 @@ def general_res():
 
       for x in table:
         payload = {
+          "table_id": x.public_id,
           "table_name": x.table_name,
           "created_on": x.created_on,
           "table_content": x.table_content,
@@ -1520,6 +1523,7 @@ def general_res():
 
       for x in table:
         payload = {
+          "table_id": x.public_id,
           "table_name": x.table_name,
           "created_on": x.created_on,
           "table_content": x.table_content,
@@ -1552,6 +1556,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1572,6 +1577,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1596,6 +1602,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1616,6 +1623,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1640,6 +1648,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1660,6 +1669,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1684,6 +1694,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1704,6 +1715,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1728,6 +1740,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1748,6 +1761,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1768,6 +1782,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1789,6 +1804,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1809,6 +1825,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1829,6 +1846,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1850,6 +1868,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1870,6 +1889,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1890,6 +1910,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1911,6 +1932,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1931,6 +1953,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1951,6 +1974,7 @@ def general_res():
 
           for x in data:
             payload = {
+              "table_id": x.public_id,
               "table_name": x.table_name,
               "created_on": x.created_on,
               "table_content": x.table_content,
@@ -1979,6 +2003,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -1999,6 +2024,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2022,6 +2048,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2042,6 +2069,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2065,6 +2093,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2085,6 +2114,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2108,6 +2138,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2128,6 +2159,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2152,6 +2184,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2172,6 +2205,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2195,6 +2229,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2215,6 +2250,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2238,6 +2274,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2258,6 +2295,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2281,6 +2319,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2301,6 +2340,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2325,6 +2365,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2345,6 +2386,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2368,6 +2410,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2388,6 +2431,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2411,6 +2455,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2431,6 +2476,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2454,6 +2500,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2474,6 +2521,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2501,6 +2549,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2521,6 +2570,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2543,6 +2593,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2563,6 +2614,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "table_content": x.table_content,
                 "display": x.display,
@@ -2584,6 +2636,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2604,6 +2657,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2626,6 +2680,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2646,6 +2701,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2669,6 +2725,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2689,6 +2746,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2711,6 +2769,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2731,6 +2790,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "table_content": x.table_content,
                 "display": x.display,
@@ -2752,6 +2812,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2772,6 +2833,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2794,6 +2856,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2814,6 +2877,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2837,6 +2901,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2857,6 +2922,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2879,6 +2945,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2899,6 +2966,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "table_content": x.table_content,
                 "display": x.display,
@@ -2920,6 +2988,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2940,6 +3009,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2962,6 +3032,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2982,6 +3053,7 @@ def general_res():
 
             for x in data:
               payload = {
+                "table_id": x.public_id,
                 "table_name": x.table_name,
                 "created_on": x.created_on,
                 "table_content": x.table_content,
@@ -2996,20 +3068,25 @@ def general_res():
             carrier.sort(key=lambda k: k['created_on'], reverse=True)
             return jsonify(carrier)
 
-@api_endpoint.route('/api/public/resource/table/<table_name>')
-def table_detail(table_name):
-  table = DynamicData.objects(table_name__iexact=table_name).get()
-  return jsonify({
-    "table_name": table.table_name,
-    "created_on": table.created_on,
-    "table_content": table.table_content,
-    "display": table.display,
-    "table_owner": {
-      "username": table.owner.username,
-      "organization": table.owner.org.org_name,
-      "sector": table.owner.org.sector_group.sector_name
-    }
-  })
+@api_endpoint.route('/api/public/resource/table/<table>')
+def table_detail(table):
+  try:
+    table = DynamicData.objects(public_id__iexact=table).get()
+    return jsonify({
+      "table_id": table.public_id,
+      "table_name": table.table_name,
+      "created_on": table.created_on,
+      "table_content": table.table_content,
+      "display": table.display,
+      "table_owner": {
+        "username": table.owner.username,
+        "organization": table.owner.org.org_name,
+        "sector": table.owner.org.sector_group.sector_name
+      }
+    })
+
+  except mongoengine.errors.DoesNotExist:
+    return jsonify([])
 
 
 @api_endpoint.route('/api/public/resource/file/<filename>')

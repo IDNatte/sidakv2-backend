@@ -1,5 +1,11 @@
 from datetime import datetime
 from mongoengine import *
+import secrets
+import string
+
+def public_id():
+  a = string.ascii_letters + string.digits
+  return ''.join(secrets.choice(a) for i in range(10))
 
 class SectoralGroup(Document):
   sector_name = StringField(required=True)
@@ -17,6 +23,7 @@ class User(Document):
   lvl = IntField(required=True)
 
 class DynamicData(DynamicDocument):
+  public_id = StringField(default=public_id)
   created_on = DateTimeField(default=datetime.now)
   owner = ReferenceField(User)
   table_name = StringField(required=True, unique=True)
