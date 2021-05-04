@@ -1430,20 +1430,116 @@ def general_sect():
 
 @api_endpoint.route('/api/public/org')
 def general_org():
-  carrier = []
-  org = Organization.objects()
+  query = request.args.get('q')
 
-  for x in org:
-    payload = {
-      "org_id": str(x.id),
-      "org_name": x.org_name,
-      "sector": {
-        "sector_id": str(x.sector_group.id),
-        "sector_name": x.sector_group.sector_name
+  if query:
+    group_by = request.args.get('group_by')
+    display = request.args.get('display')
+    sector = request.args.get('sector')
+    org = request.args.get('org')
+
+    if group_by == 'sector':
+      if sector:
+        carrier = []
+        sector = SectoralGroup.objects(sector_name__iexact=sector)
+        org = Organization.objects(sector_group__in=sector).all()
+        for x in org:
+          payload = {
+            "org_id": str(x.id),
+            "org_name": x.org_name,
+            "sector": {
+              "sector_id": str(x.sector_group.id),
+              "sector_name": x.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        carrier.sort(key=lambda k: k['org_name'])
+        return jsonify(carrier)
+
+      else:
+        carrier = []
+        org = Organization.objects().order_by('+org_name')
+
+        for x in org:
+          payload = {
+            "org_id": str(x.id),
+            "org_name": x.org_name,
+            "sector": {
+              "sector_id": str(x.sector_group.id),
+              "sector_name": x.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        carrier.sort(key=lambda k: k['org_name'])
+        return jsonify(carrier)
+
+    elif group_by == 'org':
+      if org:      
+        data = Organization.objects(org_name__iexact=org).first()
+
+        if data:        
+          return jsonify({
+            "org_id": str(data.id),
+            "org_name": data.org_name,
+            "sector": {
+              "sector_id": str(data.sector_group.id),
+              "sector_name": data.sector_group.sector_name
+            }
+          })
+
+        else:
+          return jsonify([])
+
+      else:
+        carrier = []
+        org = Organization.objects().order_by('+org_name')
+
+        for x in org:
+          payload = {
+            "org_id": str(x.id),
+            "org_name": x.org_name,
+            "sector": {
+              "sector_id": str(x.sector_group.id),
+              "sector_name": x.sector_group.sector_name
+            }
+          }
+          carrier.append(payload)
+        carrier.sort(key=lambda k: k['org_name'], reverse=True)
+        return jsonify(carrier)
+
+    else:
+      carrier = []
+      org = Organization.objects().order_by('+org_name')
+
+      for x in org:
+        payload = {
+          "org_id": str(x.id),
+          "org_name": x.org_name,
+          "sector": {
+            "sector_id": str(x.sector_group.id),
+            "sector_name": x.sector_group.sector_name
+          }
+        }
+        carrier.append(payload)
+      carrier.sort(key=lambda k: k['org_name'])
+      return jsonify(carrier)
+
+  else:  
+    carrier = []
+    org = Organization.objects().order_by('+org_name')
+
+    for x in org:
+      payload = {
+        "org_id": str(x.id),
+        "org_name": x.org_name,
+        "sector": {
+          "sector_id": str(x.sector_group.id),
+          "sector_name": x.sector_group.sector_name
+        }
       }
-    }
-    carrier.append(payload)
-  return jsonify(carrier)
+      carrier.append(payload)
+    carrier.sort(key=lambda k: k['org_name'], reverse=True)
+    return jsonify(carrier)
 
 @api_endpoint.route('/api/public/resource')
 def general_res():
