@@ -10,6 +10,18 @@ import os
 
 api_endpoint = Blueprint('api_endpoint', __name__)
 
+@api_endpoint.after_request
+def add_header(response):
+  response.headers['Access-Control-Allow-Origin'] = 'https://sidakdemo.tapinkab.go.id'
+  response.headers['Content-Security-Policy'] = "default-src 'self'"
+  response.headers['X-Content-Type-Options'] = 'nosniff'
+  response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+  response.headers['X-XSS-Protection'] = '1; mode=block'
+  response.headers['X-Powered-By'] = 'Python'
+  response.headers['Vary'] = 'Origin'
+
+  return response
+
 @api_endpoint.before_app_request
 def before_request():
   g.request_start_time = time.time()
@@ -27,7 +39,7 @@ def errorhandler(error):
   return jsonify({"status": error.code, "message": error.description}), error.code
 
 # server info API
-@api_endpoint.route('/api', methods=['GET'])
+@api_endpoint.route('/api/status', methods=['GET'])
 def server_info():
   sv_info = {
     "current_timestamp": datetime.datetime.now(),
