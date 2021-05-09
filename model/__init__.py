@@ -28,3 +28,11 @@ class DynamicData(DynamicDocument):
   owner = ReferenceField(User)
   table_name = StringField(required=True, unique=True)
   table_desc = StringField(required=True)
+
+  meta = {
+    'indexes': [
+      {
+        'fields': ['$table_name']
+      }
+    ]
+  }

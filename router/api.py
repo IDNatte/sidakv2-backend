@@ -3569,9 +3569,7 @@ def file_serve(filename):
 def general_search():
   carrier = []
   query = request.args.get('query')
-  org = Organization.objects(org_name__iexact=query)
-  owner = User.objects(org__in=org).all()
-  table = DynamicData.objects(owner__in=owner).all().order_by('-created_on')
+  table = DynamicData.objects.search_text(query).all().order_by('-created_on')
   for x in table:
     payload = {
       "table_id": x.public_id,
