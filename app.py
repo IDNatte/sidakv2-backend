@@ -6,7 +6,7 @@ import os
 
 sisv = Flask(__name__)
 sisv.config.from_json('./config/flask.config.json')
-CORS(sisv)
+CORS(sisv, origins='https://sidakdemo.tapinkab.go.id')
 
 sisv.register_blueprint(api.api_endpoint)
 sisv.register_blueprint(main_page)
