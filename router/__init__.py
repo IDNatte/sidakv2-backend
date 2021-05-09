@@ -1,6 +1,6 @@
 """Common router config"""
-
 from flask import Blueprint, render_template
+import platform
 import os
 
 static_url_path = ('/static')
