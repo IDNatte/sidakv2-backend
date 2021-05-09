@@ -10,10 +10,6 @@ main_page = Blueprint('main_page', __name__, template_folder=template_folder, st
 
 @main_page.after_request
 def add_header(response):
-  response.headers['Content-Security-Policy'] = "default-src 'self'"
-  response.headers['X-Content-Type-Options'] = 'nosniff'
-  response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-  response.headers['X-XSS-Protection'] = '1; mode=block'
   response.headers['X-Powered-By'] = 'Python {0}'.format(platform.python_version())
 
   return response
