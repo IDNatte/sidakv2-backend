@@ -3538,6 +3538,7 @@ def general_res():
             carrier.sort(key=lambda k: k['created_on'], reverse=True)
             return jsonify(carrier)
 
+
 @api_endpoint.route('/api/public/resource/table/<table>')
 def table_detail(table):
   try:
@@ -3564,6 +3565,30 @@ def file_serve(filename):
   return send_from_directory(current_app.config.get('UPLOAD_FOLDER'), filename)
 
 # helper endpoint
+@api_endpoint.route('/api/public/search')
+def general_search():
+  carrier = []
+  query = request.args.get('query')
+  table = DynamicData.objects(table_name__iexact=query)
+  for x in table:
+    payload = {
+      "table_id": x.public_id,
+      "table_name": x.table_name,
+      "created_on": x.created_on,
+      "table_content": x.table_content,
+      "display": x.display,
+      "table_owner": {
+        "username": x.owner.username,
+        "organization": x.owner.org.org_name,
+        "sector": x.owner.org.sector_group.sector_name
+      }
+    }
+    carrier.append(payload)
+
+  carrier.sort(key=lambda k: k['created_on'], reverse=True)
+  return jsonify(carrier)
+
+
 @api_endpoint.route('/api/public/count/<item>')
 def general_count(item):
   if item == 'resource':
