@@ -3569,7 +3569,8 @@ def file_serve(filename):
 def general_search():
   carrier = []
   query = request.args.get('query')
-  table = DynamicData.objects(table_name__iexact=query)
+  org = Organization.objects(org_name__iexact=query)
+  table = DynamicData.objects(table_name__in=org).all().order_by('-created_on')
   for x in table:
     payload = {
       "table_id": x.public_id,
