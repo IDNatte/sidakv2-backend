@@ -8,7 +8,7 @@ static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static
 template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates/')
 main_page = Blueprint('main_page', __name__, template_folder=template_folder, static_folder=static_folder)
 
-@api_endpoint.after_request
+@main_page.after_request
 def add_header(response):
   response.headers['Content-Security-Policy'] = "default-src 'self'"
   response.headers['X-Content-Type-Options'] = 'nosniff'
