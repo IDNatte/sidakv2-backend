@@ -3,6 +3,7 @@ from model import User, DynamicData, Organization, SectoralGroup, dbhelper
 from helper import authentication, allowed_file
 from werkzeug import utils
 import mongoengine
+import platform
 import datetime
 import time
 import jwt
@@ -17,7 +18,7 @@ def add_header(response):
   response.headers['X-Content-Type-Options'] = 'nosniff'
   response.headers['X-Frame-Options'] = 'SAMEORIGIN'
   response.headers['X-XSS-Protection'] = '1; mode=block'
-  response.headers['X-Powered-By'] = 'Python'
+  response.headers['X-Powered-By'] = 'Python {0}'.format(platform.python_version())
   response.headers['Vary'] = 'Origin'
 
   return response
