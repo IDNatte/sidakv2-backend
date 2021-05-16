@@ -13,14 +13,14 @@ api_endpoint = Blueprint('api_endpoint', __name__)
 
 @api_endpoint.after_request
 def add_header(response):
-  response.headers['Access-Control-Allow-Origin'] = '*'
-  # response.headers['Access-Control-Allow-Origin'] = 'https://sidakdemo.tapinkab.go.id'
-  # response.headers['Content-Security-Policy'] = "default-src 'self'"
-  # response.headers['X-Content-Type-Options'] = 'nosniff'
-  # response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-  # response.headers['X-XSS-Protection'] = '1; mode=block'
-  # response.headers['X-Powered-By'] = 'Python {0}'.format(platform.python_version())
-  # response.headers['Vary'] = 'Origin'
+  # response.headers['Access-Control-Allow-Origin'] = '*'
+  response.headers['Access-Control-Allow-Origin'] = 'https://sidakdemo.tapinkab.go.id'
+  response.headers['Content-Security-Policy'] = "default-src 'self'"
+  response.headers['X-Content-Type-Options'] = 'nosniff'
+  response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+  response.headers['X-XSS-Protection'] = '1; mode=block'
+  response.headers['X-Powered-By'] = 'Python {0}'.format(platform.python_version())
+  response.headers['Vary'] = 'Origin'
 
   return response
 
