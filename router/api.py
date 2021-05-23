@@ -276,7 +276,7 @@ def user_list(current_user):
           "password": "protected",
           "organization": x.org.org_name,
           "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
-          "is_active": x.is_active
+          "is_active": x.is_active,
           "email": x.email
         }
 
