@@ -270,7 +270,7 @@ def user_list(current_user):
     if current_user.lvl == 1:
       query = request.args.get('query')
 
-      if query == True:
+      if query == 'true':
         user_id = request.args.get('user')
         if user_id:
 
