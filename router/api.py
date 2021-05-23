@@ -268,21 +268,56 @@ def user_list(current_user):
   if request.method == "GET":
     carrier = []
     if current_user.lvl == 1:
-      user = User.objects()
-      for x in user:
-        payload = {
-          "user_id": str(x.id),
-          "username": x.username,
-          "password": "protected",
-          "organization": x.org.org_name,
-          "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
-          "is_active": x.is_active,
-          "email": x.email
-        }
+      query = request.args.get('query')
 
-        carrier.append(payload)
+      if query:
+        user_id = request.args.get('user')
+        if user_id:
 
-      return jsonify(carrier)
+          user = User.objects(id=user_id).get()
+          return jsonify({
+            "user_id": str(user.id),
+            "username": user.username,
+            "password": "protected",
+            "organization": user.org.org_name,
+            "user_level": "admin" if int(user.lvl) == 1 else "cm_moderator",
+            "is_active": user.is_active,
+            "email": user.email            
+          })
+
+        else:
+          user = User.objects()
+          for x in user:
+            payload = {
+              "user_id": str(x.id),
+              "username": x.username,
+              "password": "protected",
+              "organization": x.org.org_name,
+              "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
+              "is_active": x.is_active,
+              "email": x.email
+            }
+
+            carrier.append(payload)
+
+          return jsonify(carrier)
+
+      else:
+        user = User.objects()
+        for x in user:
+          payload = {
+            "user_id": str(x.id),
+            "username": x.username,
+            "password": "protected",
+            "organization": x.org.org_name,
+            "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
+            "is_active": x.is_active,
+            "email": x.email
+          }
+
+          carrier.append(payload)
+
+        return jsonify(carrier)
     else:
       abort(401, {'authorizationError': 'Only admin can see user list!'})
 
