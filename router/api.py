@@ -14,6 +14,8 @@ api_endpoint = Blueprint('api_endpoint', __name__)
 @api_endpoint.after_request
 def add_header(response):
   response.headers['Access-Control-Allow-Origin'] = '*'
+  response.headers['Access-Control-Allow-Methods'] = '*'
+  response.headers['Access-Control-Allow-Headers'] = '*'
   # response.headers['Access-Control-Allow-Origin'] = 'https://sidakdemo.tapinkab.go.id'
   # response.headers['Content-Security-Policy'] = "default-src 'self'"
   # response.headers['X-Content-Type-Options'] = 'nosniff'
