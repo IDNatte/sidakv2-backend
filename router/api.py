@@ -1464,6 +1464,27 @@ def upload(current_user):
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
+@api_endpoint.route('/api/resource/table/<table>')
+@authentication
+def resource_table(current_user, table):
+  try:
+    content = DynamicData.objects(id=table).get()
+    return jsonify({
+      "table_id": str(content.id),
+      "table_name": content.table_name,
+      "created_on": content.created_on,
+      "table_content": content.table_content,
+      "display": content.display,
+      "table_owner": {
+        "username": content.owner.username,
+        "organization": content.owner.org.org_name,
+        "sector": content.owner.org.sector_group.sector_name
+      }
+    })
+
+  except mongoengine.errors.DoesNotExist:
+    return jsonify([])
+
 # general endpoint
 
 @api_endpoint.route('/api/public/sectoral')
@@ -3594,17 +3615,17 @@ def general_res():
 @api_endpoint.route('/api/public/resource/table/<table>')
 def table_detail(table):
   try:
-    table = DynamicData.objects(public_id__iexact=table).get()
+    content = DynamicData.objects(public_id__iexact=table).get()
     return jsonify({
-      "table_id": table.public_id,
-      "table_name": table.table_name,
-      "created_on": table.created_on,
-      "table_content": table.table_content,
-      "display": table.display,
+      "table_id": content.public_id,
+      "table_name": content.table_name,
+      "created_on": content.created_on,
+      "table_content": content.table_content,
+      "display": content.display,
       "table_owner": {
-        "username": table.owner.username,
-        "organization": table.owner.org.org_name,
-        "sector": table.owner.org.sector_group.sector_name
+        "username": content.owner.username,
+        "organization": content.owner.org.org_name,
+        "sector": content.owner.org.sector_group.sector_name
       }
     })
 
@@ -3617,6 +3638,11 @@ def file_serve(filename):
   return send_from_directory(current_app.config.get('UPLOAD_FOLDER'), filename)
 
 # helper endpoint
+@api_endpoint.route('/api/search')
+@authentication
+def search(current_user):
+  return jsonify({"test": "test"})
+
 @api_endpoint.route('/api/public/search')
 def general_search():
   carrier = []
