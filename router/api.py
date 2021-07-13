@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
-from model import User, DynamicData, Organization, SectoralGroup, dbhelper
+from model import User, DynamicData, Organization, SectoralGroup, OrgDetail, dbhelper
 from helper import authentication, allowed_file
 from werkzeug import utils
 import mongoengine
@@ -55,6 +55,237 @@ def server_info():
   return jsonify(sv_info)
 
 # authorization API
+@api_endpoint.route('/api/auth/login', methods=["POST"])
+def authorization():
+  if request.method == "POST":
+    try:
+      email = request.get_json()['email']
+      password = request.get_json()['password']
+      
+      user_data = User.objects.get(email=email)
+      passwd_authentication = dbhelper.check_password(user_data.password, password)
+
+      if user_data.is_active:
+        if passwd_authentication:
+          token_exp = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+          token = jwt.encode({
+            "carrier": {
+              "uid": str(user_data.id)
+            },
+            'exp': datetime.datetime.now() + datetime.timedelta(days=1), 
+          }, current_app.config['SECRET_KEY'], algorithm='HS256')
+          return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
+        else:
+          abort(401, {'authorizationError': 'Wrong password'})
+      else:
+        abort(401, {'authorizationError': 'Account terminated !'})
+
+    except KeyError as e:
+      abort(401, {'authorizationError': 'Not sufficient or wrong argument given'})
+
+    except mongoengine.errors.DoesNotExist as e:
+      abort(401, {'authorizationError': 'Email not registered'})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/auth/register', methods=["GET","POST"])
+@authentication
+def register(current_user):
+  if request.method == 'POST':
+    try:
+      if current_user.lvl == 1:
+        is_active = request.get_json()['is_active']
+        username = request.get_json()['username']
+        password = request.get_json()['password']
+        email = request.get_json()['email']
+        sector = request.get_json()['sector']
+        org = request.get_json()['org']
+        lvl = request.get_json()['lvl']
+        
+        org_search = Organization.objects.filter(id=org, sector_group=sector).count()
+
+        if org_search > 0:
+
+          organization = Organization.objects.filter(id=org, sector_group=sector).get()
+          user = User(username=username, email=email, org=organization, lvl=lvl, is_active=bool(is_active))
+          user.password = dbhelper.generate_password_hash(password)
+          user.save()
+
+          send_back = {
+            "user_id": str(user.id),
+            "username": str(user.username),
+            "email": str(user.email),
+            "password": "protected",
+            "org": str(user.org.org_name),
+            "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator",
+            "is_activated": user.is_active
+          }
+          
+          return jsonify(send_back)
+
+        else:
+          abort(403, {'orgListError': 'No organization or sector list registered'})          
+
+      else:
+        abort(401, {'authorizationError': 'Only admin can perform this action !'})
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    except (mongoengine.errors.NotUniqueError):
+      abort(403, {'AccountError': 'Account already registered'})
+
+    except mongoengine.errors.ValidationError:
+      abort(403, {'InvalidRequestBodyError': 'Argument secotor or org suplied by non-id value !'})
+
+  else:
+    abort(400, {'MethodeError': 'Forbidden action'})
+
+# protected endpoint
+
+@api_endpoint.route('/api/user/me', methods=["GET", "PUT"])
+@authentication
+def get_me(current_user):
+  if request.method == "GET":  
+    return jsonify({
+      "username" : str(current_user.username),
+      "email": str(current_user.email),
+      "password": "*****",
+      "org": current_user.org.org_name,
+      "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
+      "user_id": str(current_user.id),
+      "is_active": current_user.is_active
+    })
+
+  elif request.method == "PUT":
+    try:
+      username = request.get_json()['username']
+      password = request.get_json()['password']
+      email = request.get_json()['email']
+      org = request.get_json()['org']
+
+      user = User.objects(id=current_user.id).get()
+      password_change = dbhelper.set_password(password)
+      org_change = Organization.objects(org_name__iexact=org).get()
+
+      user.update(**{
+        "username": username,
+        "password": password_change,
+        "email": email,
+        "org": org_change.id
+      })
+
+      return jsonify({"userUpdated": True})
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/user', methods=["GET", "PATCH", "DELETE"])
+@authentication
+def user_list(current_user):
+  if request.method == "GET":
+    carrier = []
+    if current_user.lvl == 1:
+      query = request.args.get('query')
+
+      if query == 'true':
+        user_id = request.args.get('user')
+        if user_id:
+
+          user = User.objects(id=user_id).get()
+          return jsonify({
+            "user_id": str(user.id),
+            "username": user.username,
+            "password": "protected",
+            "organization": user.org.org_name,
+            "user_level": "admin" if int(user.lvl) == 1 else "cm_moderator",
+            "is_active": user.is_active,
+            "email": user.email            
+          })
+
+        else:
+          user = User.objects()
+          for x in user:
+            payload = {
+              "user_id": str(x.id),
+              "username": x.username,
+              "password": "protected",
+              "organization": x.org.org_name,
+              "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
+              "is_active": x.is_active,
+              "email": x.email
+            }
+
+            carrier.append(payload)
+
+          return jsonify(carrier)
+
+      else:
+        user = User.objects()
+        for x in user:
+          payload = {
+            "user_id": str(x.id),
+            "username": x.username,
+            "password": "protected",
+            "organization": x.org.org_name,
+            "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
+            "is_active": x.is_active,
+            "email": x.email
+          }
+
+          carrier.append(payload)
+
+        return jsonify(carrier)
+    else:
+      abort(401, {'authorizationError': 'Only admin can see user list!'})
+
+  elif request.method == "PATCH":
+    if current_user.lvl == 1:
+      try:
+        is_activated = request.get_json()['is_active']
+        raw_password = request.get_json()['password']
+        username = request.get_json()['username']
+        user_id = request.get_json()['user_id']
+        email = request.get_json()['email']
+
+        user = User.objects(id=user_id).first()
+        password = dbhelper.set_password(raw_password)
+
+        user.update(**{"username": username, "password": password, "email": email, "is_active":bool(is_activated)})
+
+        return jsonify({"userUpdated": True})
+
+      except KeyError as e:
+        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    else:
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+
+  elif request.method == "DELETE":
+    if current_user.lvl == 1:
+      try:
+        user_id = request.get_json()['user_id']
+        user = User.objects(id=user_id).first()
+        user.update(**{"is_active": False})
+
+        return jsonify({
+          "user_deactivated": True,
+          "username": user.username
+        })
+
+      except KeyError as e:
+        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    else:
+      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
 @api_endpoint.route('/api/sectoral', methods=["GET", "POST"])
 @authentication
 def sector_list(current_user):
@@ -161,205 +392,44 @@ def org_list(current_user):
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
 
-@api_endpoint.route('/api/auth/login', methods=["POST"])
-def authorization():
-  if request.method == "POST":
-    try:
-      email = request.get_json()['email']
-      password = request.get_json()['password']
-      
-      user_data = User.objects.get(email=email)
-      passwd_authentication = dbhelper.check_password(user_data.password, password)
-
-      if user_data.is_active:
-        if passwd_authentication:
-          token_exp = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-          token = jwt.encode({
-            "carrier": {
-              "uid": str(user_data.id)
-            },
-            'exp': datetime.datetime.now() + datetime.timedelta(days=1), 
-          }, current_app.config['SECRET_KEY'], algorithm='HS256')
-          return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
-        else:
-          abort(401, {'authorizationError': 'Wrong password'})
-      else:
-        abort(401, {'authorizationError': 'Account terminated !'})
-
-    except KeyError as e:
-      abort(401, {'authorizationError': 'Not sufficient or wrong argument given'})
-
-    except mongoengine.errors.DoesNotExist as e:
-      abort(401, {'authorizationError': 'Email not registered'})
-
-  else:
-    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
-
-@api_endpoint.route('/api/auth/register', methods=["GET","POST"])
+@api_endpoint.route('/api/org/info/<org>', methods=["GET", "POST", "PATCH", "DELETE"])
 @authentication
-def register(current_user):
-  if request.method == 'POST':
+def org_detail(current_user, org):
+  if request.method == 'GET':
+    org_fetch = OrgDetail.objects(id=org)
+
+    if org_fetch != None:
+      org_info = org_fetch.first()
+
+    else:
+      return jsonify(org_fetch)
+      
+  elif request.method == "POST":
+    banner = request.args.get('banner')
+
     try:
-      if current_user.lvl == 1:
-        is_active = request.get_json()['is_active']
-        username = request.get_json()['username']
-        password = request.get_json()['password']
-        email = request.get_json()['email']
-        sector = request.get_json()['sector']
-        org = request.get_json()['org']
-        lvl = request.get_json()['lvl']
-        
-        org_search = Organization.objects.filter(id=org, sector_group=sector).count()
-
-        if org_search > 0:
-
-          organization = Organization.objects.filter(id=org, sector_group=sector).get()
-          user = User(username=username, email=email, org=organization, lvl=lvl, is_active=bool(is_active))
-          user.password = dbhelper.generate_password_hash(password)
-          user.save()
-
-          send_back = {
-            "user_id": str(user.id),
-            "username": str(user.username),
-            "email": str(user.email),
-            "password": "protected",
-            "org": str(user.org.org_name),
-            "privilege": "admin" if int(user.lvl) == 1 else "cm_moderator",
-            "is_activated": user.is_active
-          }
-          
-          return jsonify(send_back)
-
-        else:
-          abort(403, {'orgListError': 'No organization or sector list registered'})          
+      if bool(banner) == True:
+        phone = request.get_json()['phone']
+        address = request.get_json()['address']
+        email = request.get_json()['org_email']
+        org_notif = request.get_json()['notif']
+        return jsonify({"mode": "creating object", "banner": True})
 
       else:
-        abort(401, {'authorizationError': 'Only admin can perform this action !'})
+        phone = request.get_json()['phone']
+        address = request.get_json()['address']
+        email = request.get_json()['org_email']
+        org_notif = request.get_json()['notif']
+        return jsonify({"mode": "creating object", "banner": False})
 
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
-    except (mongoengine.errors.NotUniqueError):
-      abort(403, {'AccountError': 'Account already registered'})
-
-    except mongoengine.errors.ValidationError:
-      abort(403, {'InvalidRequestBodyError': 'Argument secotor or org suplied by non-id value !'})
-
-  else:
-    abort(400, {'MethodeError': 'Forbidden action'})
-
-# protected endpoint
-@api_endpoint.route('/api/user/me', methods=["GET"])
-@authentication
-def get_me(current_user):
-  return jsonify({
-    "username" : str(current_user.username),
-    "email": str(current_user.email),
-    "password": "*****",
-    "org": current_user.org.org_name,
-    "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
-    "user_id": str(current_user.id),
-    "is_active": current_user.is_active
-  })
-
-@api_endpoint.route('/api/user', methods=["GET", "PATCH", "DELETE"])
-@authentication
-def user_list(current_user):
-  if request.method == "GET":
-    carrier = []
-    if current_user.lvl == 1:
-      query = request.args.get('query')
-
-      if query == 'true':
-        user_id = request.args.get('user')
-        if user_id:
-
-          user = User.objects(id=user_id).get()
-          return jsonify({
-            "user_id": str(user.id),
-            "username": user.username,
-            "password": "protected",
-            "organization": user.org.org_name,
-            "user_level": "admin" if int(user.lvl) == 1 else "cm_moderator",
-            "is_active": user.is_active,
-            "email": user.email            
-          })
-
-        else:
-          user = User.objects()
-          for x in user:
-            payload = {
-              "user_id": str(x.id),
-              "username": x.username,
-              "password": "protected",
-              "organization": x.org.org_name,
-              "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
-              "is_active": x.is_active,
-              "email": x.email
-            }
-
-            carrier.append(payload)
-
-          return jsonify(carrier)
-
-      else:
-        user = User.objects()
-        for x in user:
-          payload = {
-            "user_id": str(x.id),
-            "username": x.username,
-            "password": "protected",
-            "organization": x.org.org_name,
-            "user_level": "admin" if int(x.lvl) == 1 else "cm_moderator",
-            "is_active": x.is_active,
-            "email": x.email
-          }
-
-          carrier.append(payload)
-
-        return jsonify(carrier)
-    else:
-      abort(401, {'authorizationError': 'Only admin can see user list!'})
-
   elif request.method == "PATCH":
-    if current_user.lvl == 1:
-      try:
-        is_activated = request.get_json()['is_active']
-        raw_password = request.get_json()['password']
-        username = request.get_json()['username']
-        user_id = request.get_json()['user_id']
-        email = request.get_json()['email']
-
-        user = User.objects(id=user_id).first()
-        password = dbhelper.set_password(raw_password)
-
-        user.update(**{"username": username, "password": password, "email": email, "is_active":bool(is_activated)})
-
-        return jsonify({"userUpdated": True})
-
-      except KeyError as e:
-        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
-
-    else:
-      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+    return jsonify({"mode": "updating object"})
 
   elif request.method == "DELETE":
-    if current_user.lvl == 1:
-      try:
-        user_id = request.get_json()['user_id']
-        user = User.objects(id=user_id).first()
-        user.update(**{"is_active": False})
-
-        return jsonify({
-          "user_deactivated": True,
-          "username": user.username
-        })
-
-      except KeyError as e:
-        abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
-
-    else:
-      abort(401, {'authorizationError': 'Only admin can perform this action !'})
+    return jsonify({"mode": "deleting object"})
 
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
@@ -3638,10 +3708,10 @@ def file_serve(filename):
   return send_from_directory(current_app.config.get('UPLOAD_FOLDER'), filename)
 
 # helper endpoint
-@api_endpoint.route('/api/search')
-@authentication
-def search(current_user):
-  return jsonify({"test": "test"})
+# @api_endpoint.route('/api/search')
+# @authentication
+# def search(current_user):
+#   return jsonify({"test": "test"})
 
 @api_endpoint.route('/api/public/search')
 def general_search():

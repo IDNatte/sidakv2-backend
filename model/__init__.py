@@ -22,6 +22,20 @@ class User(Document):
   org = ReferenceField(Organization)
   lvl = IntField(required=True)
 
+class OrgDetail(Document):
+  org = ReferenceField(Organization)
+  creator = ReferenceField(User)
+  public_id = StringField(default=public_id)
+  created_on = DateTimeField(default=datetime.now)
+  org_address = StringField(max_length=1024)
+  org_email = EmailField(max_length=150)
+  org_phone = IntField(min_value=0)
+  org_notification = StringField(max_length=200)
+  org_banner_name = StringField(max_length=50)
+  org_banner_path = StringField(max_length=200)
+  org_banner_link = StringField(max_length=200)
+
+
 class DynamicData(DynamicDocument):
   public_id = StringField(default=public_id)
   created_on = DateTimeField(default=datetime.now)
