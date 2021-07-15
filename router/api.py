@@ -1,6 +1,6 @@
+from model import User, DynamicData, Organization, SectoralGroup, OrgDetail, OrgDetailBanner, dbhelper
 from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
-from model import User, DynamicData, Organization, SectoralGroup, OrgDetail, dbhelper
-from helper import authentication, allowed_file
+from helper import authentication, allowed_file, allowed_file_img
 from werkzeug import utils
 import mongoengine
 import platform
@@ -396,40 +396,84 @@ def org_list(current_user):
 @authentication
 def org_detail(current_user, org):
   if request.method == 'GET':
-    org_fetch = OrgDetail.objects(id=org)
+    org_fetch = OrgDetail.objects(org=org)
 
     if org_fetch != None:
       org_info = org_fetch.first()
+      return jsonify(org_info)
 
     else:
       return jsonify(org_fetch)
       
   elif request.method == "POST":
-    banner = request.args.get('banner')
-
     try:
-      if bool(banner) == True:
-        phone = request.get_json()['phone']
-        address = request.get_json()['address']
-        email = request.get_json()['org_email']
-        org_notif = request.get_json()['notif']
-        return jsonify({"mode": "creating object", "banner": True})
+      phone = request.get_json()['phone']
+      address = request.get_json()['address']
+      email = request.get_json()['email']
+      org_notif = request.get_json()['notif']
 
-      else:
-        phone = request.get_json()['phone']
-        address = request.get_json()['address']
-        email = request.get_json()['org_email']
-        org_notif = request.get_json()['notif']
-        return jsonify({"mode": "creating object", "banner": False})
+      org_info = OrgDetail(org=current_user.org.id, creator=current_user.id, org_address=address, org_email=email, org_phone=phone, org_notification=org_notif)
+      org_info.save()
 
+      return ({'created': True})
+        
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
   elif request.method == "PATCH":
-    return jsonify({"mode": "updating object"})
+    try:    
+      phone = request.get_json()['phone']
+      address = request.get_json()['address']
+      email = request.get_json()['email']
+      org_notif = request.get_json()['notif']
+
+      org = OrgDetail.objects(org=current_user.org.id).get()
+
+      org.update(**{
+        "org_address": address,
+        "org_email": email,
+        "org_phone": phone,
+        "org_notification": org_notif
+      })
+
+      return jsonify({
+        "updated": True
+      })
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+    except Exception as e:
+      if e.code == 400:
+        abort(403, {'InvalidRequestBodyError': 'None argument found in body'})
+      else:
+        abort(400, {'Error': e.description})
 
   elif request.method == "DELETE":
-    return jsonify({"mode": "deleting object"})
+    try:
+      wich = request.get_json()['wich']
+
+      if wich == "banner":
+        detail = OrgDetail.objects(org=current_user.org.id).first()
+        banner = OrgDetailBanner.objects(org_detail=detail.id).first()
+        
+        os.remove(banner.org_banner_path)
+        banner.delete()
+        return jsonify({"deleted": True, "content": "banner"})
+
+      elif wich == 'all':
+        detail = OrgDetail.objects(org=current_user.org.id).first()
+        banner = OrgDetailBanner.objects(org_detail=detail.id).first()
+        
+        os.remove(banner.org_banner_path)
+        detail.delete()
+        return jsonify({"deleted": True, "content": "all"})
+
+      else:
+        abort(403, {'InvalidDeletionError': 'Invalid type of delete selection'})
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
@@ -1452,7 +1496,6 @@ def resource(current_user):
         abort(403, {'DeleteEntityError': 'Cannot determine what to delete'})
 
     except AttributeError as e:
-      print(e)
       abort(403, {'DeleteEntityError': 'Cannot determine what to delete'})
 
     except KeyError as e:
@@ -1531,6 +1574,40 @@ def upload(current_user):
 
     except mongoengine.errors.DoesNotExist as e:
       abort(403, {"InputError": str(e)})
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
+
+@api_endpoint.route('/api/org/upload', methods=["PATCH"])
+@authentication
+def org_info_upl(current_user):
+  if request.method == "PATCH":    
+    try:
+      org = OrgDetail.objects(org=current_user.org.id).get()
+      file = request.files['org_content']
+
+      if allowed_file_img(file.filename):
+        folder = os.path.join(current_app.config.get('UPLOAD_FOLDER'), 'organization/')
+        filename = utils.secure_filename('{0}-{1}.{2}'.format(time.time(), current_user.org.org_name, file.filename.split('.')[1]))
+        url = '/api/public/org/file/{0}'.format(filename)
+
+        file.save(os.path.join(folder, filename))
+
+        banner = OrgDetailBanner(
+          org_detail=org,
+          org_banner_name="{0}".format(file.filename.split('.')[0]),
+          org_banner_path="{0}{1}".format(folder, filename),
+          org_banner_url=url
+        )
+
+        banner.save()
+
+        return jsonify({"fileUploaded": True})
+      else:
+        abort(403, {"FileExtNotAllowedError": "File extension is not allowed"})
+
+    except Exception as e:
+      abort(e.code, {"Error": e.description})
+
   else:
     abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
@@ -3707,11 +3784,10 @@ def table_detail(table):
 def file_serve(filename):
   return send_from_directory(current_app.config.get('UPLOAD_FOLDER'), filename)
 
-# helper endpoint
-# @api_endpoint.route('/api/search')
-# @authentication
-# def search(current_user):
-#   return jsonify({"test": "test"})
+@api_endpoint.route('/api/public/org/file/<filename>')
+def org_file_serve(filename):
+  folder = os.path.join(current_app.config.get('UPLOAD_FOLDER'), 'organization/')
+  return send_from_directory(folder, filename)
 
 @api_endpoint.route('/api/public/search')
 def general_search():

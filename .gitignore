@@ -20,3 +20,5 @@ data
 ./db/*.db
 snippet.txt
 init_admin.py
+
+public/upload/

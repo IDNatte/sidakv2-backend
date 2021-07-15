@@ -6,6 +6,7 @@ from model import User
 import jwt
 
 ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_EXTENSIONS_IMG = {'jpg', 'png'}
 
 def authentication(f):
   """Authentication helper"""
@@ -38,3 +39,6 @@ def authentication(f):
 
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def allowed_file_img(filename):
+  return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS_IMG
