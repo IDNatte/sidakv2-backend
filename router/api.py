@@ -1,6 +1,7 @@
 from model import User, DynamicData, Organization, SectoralGroup, OrgDetail, OrgDetailBanner, dbhelper
 from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
 from helper import authentication, allowed_file, allowed_file_img
+from config import common_config
 from werkzeug import utils
 import mongoengine
 import platform
@@ -13,16 +14,16 @@ api_endpoint = Blueprint('api_endpoint', __name__)
 
 @api_endpoint.after_request
 def add_header(response):
-  response.headers['Access-Control-Allow-Origin'] = '*'
-  response.headers['Access-Control-Allow-Methods'] = '*'
-  response.headers['Access-Control-Allow-Headers'] = '*'
-  # response.headers['Access-Control-Allow-Origin'] = 'https://sidakdemo.tapinkab.go.id'
-  # response.headers['Content-Security-Policy'] = "default-src 'self'"
-  # response.headers['X-Content-Type-Options'] = 'nosniff'
-  # response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-  # response.headers['X-XSS-Protection'] = '1; mode=block'
-  # response.headers['X-Powered-By'] = 'Python {0}'.format(platform.python_version())
-  # response.headers['Vary'] = 'Origin'
+  # response.headers['Access-Control-Allow-Origin'] = '*'
+  # response.headers['Access-Control-Allow-Methods'] = '*'
+  # response.headers['Access-Control-Allow-Headers'] = '*'
+  response.headers['Access-Control-Allow-Origin'] = common_config.HTTP_HEADER_CONFIG.get('ORIGIN')
+  response.headers['Content-Security-Policy'] = common_config.HTTP_HEADER_CONFIG.get('CSP')
+  response.headers['X-Content-Type-Options'] = common_config.HTTP_HEADER_CONFIG.get('XCTPO')
+  response.headers['X-Frame-Options'] = common_config.HTTP_HEADER_CONFIG.get('XFO')
+  response.headers['X-XSS-Protection'] = common_config.HTTP_HEADER_CONFIG.get('XSSP')
+  response.headers['X-Powered-By'] = 'Python {0}'.format(platform.python_version())
+  response.headers['Vary'] = common_config.HTTP_HEADER_CONFIG.get('VARY')
 
   return response
 
@@ -356,20 +357,50 @@ def org_list(current_user):
         abort(403, {'InvalidRequestBodyError': 'Mixed parameter in body founded'})
 
     else:
+      banner = []
+      detail = []
       carrier = []
+      
       org_list = Organization.objects
+      org_detail = OrgDetail.objects(org__in=org_list)
+      org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
 
-      for x in org_list:
+      for x in org_banner:
+        banner.append({
+          "id": str(x.id),
+          "banner": x.org_banner_name,
+          "url": x.org_banner_url,
+          "path": x.org_banner_path
+        })
+
+      for y in org_detail:
+        detail.append({
+          "id": str(y.id),
+          "phone": y.org_phone,
+          "email": y.org_email,
+          "notif": y.org_notification,
+          "admin": {
+            "username": y.creator.username,
+            "email": y.creator.email,
+            "lvl": y.creator.lvl,
+            "status": y.creator.is_active
+          }
+        })
+
+      for z in org_list:
         payload = {
-          "org_id": str(x.id),
-          "org_name": x.org_name,
+          "org_id": str(z.id),
+          "org_name": z.org_name,
+          "org_detail": detail,
+          "banner": banner,
           "org_sector": {
-            "sector_id": str(x.sector_group.id),
-            "sector_name": x.sector_group.sector_name,
+            "sector_id": str(z.sector_group.id),
+            "sector_name": z.sector_group.sector_name,
           }
         }
 
         carrier.append(payload)
+
       return jsonify(carrier)
 
   elif request.method == "POST":
@@ -396,14 +427,38 @@ def org_list(current_user):
 @authentication
 def org_detail(current_user, org):
   if request.method == 'GET':
-    org_fetch = OrgDetail.objects(org=org)
+    org_detail = OrgDetail.objects(org=org).get()
+    org_banner = OrgDetailBanner.objects(org_detail=org_detail.id)
 
-    if org_fetch != None:
-      org_info = org_fetch.first()
-      return jsonify(org_info)
+    banner = []
 
-    else:
-      return jsonify(org_fetch)
+    for x in org_banner:
+      banner.append({
+        "id": str(x.id),
+        "banner": x.org_banner_name,
+        "url": x.org_banner_url,
+        "path": x.org_banner_path
+      })
+
+    org = {
+      "detail_id": str(org_detail.id),
+      "address": org_detail.org_address,
+      "email": org_detail.org_email,
+      "notif": org_detail.org_notification,
+      "phone": org_detail.org_phone,
+      "banner": banner,
+      "admin": {
+        "username": org_detail.creator.username,
+        "lvl": org_detail.creator.lvl,
+        "email": org_detail.creator.email
+      },
+      "org_info": {
+        "org_name": org_detail.org.org_name,
+        "org_sector": org_detail.org.sector_group.sector_name
+      }
+    }
+
+    return jsonify(org)
       
   elif request.method == "POST":
     try:
@@ -1640,7 +1695,6 @@ def general_sect():
   sector = SectoralGroup.objects()
 
   for x in sector:
-    print(x.sector_name)
     payload = {
       "sector_id": str(x.id),
       "sector_name": x.sector_name
@@ -1660,47 +1714,138 @@ def general_org():
 
     if group_by == 'sector':
       if sector:
+        banner = []
+        detail = []
         carrier = []
+
         sector = SectoralGroup.objects(sector_name__iexact=sector)
         org = Organization.objects(sector_group__in=sector).all()
-        for x in org:
+        org_detail = OrgDetail.objects(org__in=org)
+        org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
+
+        for x in org_banner:
+          banner.append({
+            "id": x.org_public_id,
+            "banner": x.org_banner_name,
+            "url": x.org_banner_url,
+            "path": x.org_banner_path
+          })
+
+        for y in org_detail:
+          detail.append({
+            "id": y.public_id,
+            "phone": y.org_phone,
+            "email": y.org_email,
+            "notif": y.org_notification,
+            "admin": {
+              "username": y.creator.username,
+              "email": y.creator.email,
+              "lvl": y.creator.lvl,
+              "status": y.creator.is_active
+            }
+          })
+
+        for z in org:
           payload = {
-            "org_id": str(x.id),
-            "org_name": x.org_name,
+            "org_id": str(z.id),
+            "org_name": z.org_name,
+            "org_detail": detail,
+            "banner": banner,
             "sector": {
-              "sector_id": str(x.sector_group.id),
-              "sector_name": x.sector_group.sector_name
+              "sector_id": str(z.sector_group.id),
+              "sector_name": z.sector_group.sector_name
             }
           }
           carrier.append(payload)
+
         carrier.sort(key=lambda k: k['org_name'])
         return jsonify(carrier)
 
       else:
+        banner = []
+        detail = []
         carrier = []
-        org = Organization.objects().order_by('+org_name')
 
-        for x in org:
+        org = Organization.objects().order_by('+org_name')
+        org_detail = OrgDetail.objects(org__in=org)
+        org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
+
+        for x in org_banner:
+          banner.append({
+            "id": x.org_public_id,
+            "banner": x.org_banner_name,
+            "url": x.org_banner_url,
+            "path": x.org_banner_path
+          })
+
+        for y in org_detail:
+          detail.append({
+            "id": y.public_id,
+            "phone": y.org_phone,
+            "email": y.org_email,
+            "notif": y.org_notification,
+            "admin": {
+              "username": y.creator.username,
+              "email": y.creator.email,
+              "lvl": y.creator.lvl,
+              "status": y.creator.is_active
+            }
+          })
+
+        for z in org:
           payload = {
-            "org_id": str(x.id),
-            "org_name": x.org_name,
+            "org_id": str(z.id),
+            "org_name": z.org_name,
+            "org_detail": detail,
+            "banner": banner,
             "sector": {
-              "sector_id": str(x.sector_group.id),
-              "sector_name": x.sector_group.sector_name
+              "sector_id": str(z.sector_group.id),
+              "sector_name": z.sector_group.sector_name
             }
           }
           carrier.append(payload)
+
         carrier.sort(key=lambda k: k['org_name'])
         return jsonify(carrier)
 
     elif group_by == 'org':
-      if org:      
+      if org:
+        banner = []
+        detail = []
+
         data = Organization.objects(org_name__iexact=org).first()
+
+        org_detail = OrgDetail.objects(org=data)
+        org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
+
+        for x in org_banner:
+          banner.append({
+            "id": x.org_public_id,
+            "banner": x.org_banner_name,
+            "url": x.org_banner_url,
+            "path": x.org_banner_path
+          })
+
+        for y in org_detail:
+          detail.append({
+            "id": y.public_id,
+            "phone": y.org_phone,
+            "email": y.org_email,
+            "notif": y.org_notification,
+            "admin": {
+              "username": y.creator.username,
+              "email": y.creator.email,
+              "lvl": y.creator.lvl,
+              "status": y.creator.is_active
+            }
+          })
 
         if data:        
           return jsonify({
             "org_id": str(data.id),
             "org_name": data.org_name,
+            "org_detail": detail,
+            "banner": banner,
             "sector": {
               "sector_id": str(data.sector_group.id),
               "sector_name": data.sector_group.sector_name
@@ -1711,16 +1856,45 @@ def general_org():
           return jsonify([])
 
       else:
+        banner = []
+        detail = []
         carrier = []
-        org = Organization.objects().order_by('+org_name')
 
-        for x in org:
+        org = Organization.objects().order_by('+org_name')
+        org_detail = OrgDetail.objects(org__in=org)
+        org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
+
+        for x in org_banner:
+          banner.append({
+            "id": x.org_public_id,
+            "banner": x.org_banner_name,
+            "url": x.org_banner_url,
+            "path": x.org_banner_path
+          })
+
+        for y in org_detail:
+          detail.append({
+            "id": y.public_id,
+            "phone": y.org_phone,
+            "email": y.org_email,
+            "notif": y.org_notification,
+            "admin": {
+              "username": y.creator.username,
+              "email": y.creator.email,
+              "lvl": y.creator.lvl,
+              "status": y.creator.is_active
+            }
+          })
+
+        for z in org:
           payload = {
-            "org_id": str(x.id),
-            "org_name": x.org_name,
+            "org_id": str(z.id),
+            "org_name": z.org_name,
+            "org_detail": detail,
+            "banner": banner,
             "sector": {
-              "sector_id": str(x.sector_group.id),
-              "sector_name": x.sector_group.sector_name
+              "sector_id": str(z.sector_group.id),
+              "sector_name": z.sector_group.sector_name
             }
           }
           carrier.append(payload)
@@ -1728,36 +1902,96 @@ def general_org():
         return jsonify(carrier)
 
     else:
+      banner = []
+      detail = []
       carrier = []
-      org = Organization.objects().order_by('+org_name')
 
-      for x in org:
+      org = Organization.objects().order_by('+org_name')
+      org_detail = OrgDetail.objects(org__in=org)
+      org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
+
+      for x in org_banner:
+        banner.append({
+          "id": x.org_public_id,
+          "banner": x.org_banner_name,
+          "url": x.org_banner_url,
+          "path": x.org_banner_path
+        })
+
+      for y in org_detail:
+        detail.append({
+          "id": y.public_id,
+          "phone": y.org_phone,
+          "email": y.org_email,
+          "notif": y.org_notification,
+          "admin": {
+            "username": y.creator.username,
+            "email": y.creator.email,
+            "lvl": y.creator.lvl,
+            "status": y.creator.is_active
+          }
+        })
+
+      for z in org:
         payload = {
-          "org_id": str(x.id),
-          "org_name": x.org_name,
+          "org_id": str(z.id),
+          "org_name": z.org_name,
+          "org_detail": detail,
+          "banner": banner,
           "sector": {
-            "sector_id": str(x.sector_group.id),
-            "sector_name": x.sector_group.sector_name
+            "sector_id": str(z.sector_group.id),
+            "sector_name": z.sector_group.sector_name
           }
         }
         carrier.append(payload)
+
       carrier.sort(key=lambda k: k['org_name'])
       return jsonify(carrier)
 
-  else:  
+  else:
+    banner = []
+    detail = []
     carrier = []
-    org = Organization.objects().order_by('+org_name')
 
-    for x in org:
+    org = Organization.objects().order_by('+org_name')
+    org_detail = OrgDetail.objects(org__in=org)
+    org_banner = OrgDetailBanner.objects(org_detail__in=org_detail)
+
+    for x in org_banner:
+      banner.append({
+        "id": x.org_public_id,
+        "banner": x.org_banner_name,
+        "url": x.org_banner_url,
+        "path": x.org_banner_path
+      })
+
+    for y in org_detail:
+      detail.append({
+        "id": y.public_id,
+        "phone": y.org_phone,
+        "email": y.org_email,
+        "notif": y.org_notification,
+        "admin": {
+          "username": y.creator.username,
+          "email": y.creator.email,
+          "lvl": y.creator.lvl,
+          "status": y.creator.is_active
+        }
+      })
+
+    for z in org:
       payload = {
-        "org_id": str(x.id),
-        "org_name": x.org_name,
+        "org_id": str(z.id),
+        "org_name": z.org_name,
+        "org_detail": detail,
+        "banner": banner,
         "sector": {
-          "sector_id": str(x.sector_group.id),
-          "sector_name": x.sector_group.sector_name
+          "sector_id": str(z.sector_group.id),
+          "sector_name": z.sector_group.sector_name
         }
       }
       carrier.append(payload)
+
     carrier.sort(key=lambda k: k['org_name'], reverse=True)
     return jsonify(carrier)
 
