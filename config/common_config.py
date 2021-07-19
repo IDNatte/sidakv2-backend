@@ -5,8 +5,5 @@ HTTP_HEADER_CONFIG = {
 	"XFO": "SAMEORIGIN",
 	"XSSP": "1; mode=block",
 	"XPB": "Python",
-	"ORIGIN": [
-		"https://sidakdemo.tapinkab.go.id",
-		"http://localhost"
-	],
+	"ORIGIN": "https://sidakdemo.tapinkab.go.id",
 }
