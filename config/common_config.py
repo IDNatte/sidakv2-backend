@@ -6,4 +6,5 @@ HTTP_HEADER_CONFIG = {
 	"XSSP": "1; mode=block",
 	"XPB": "Python",
 	"ORIGIN": "*",
+	"ACAH": "GET, POST, PATCH, PUT, DELETE"
 }
