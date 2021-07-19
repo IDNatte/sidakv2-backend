@@ -15,8 +15,8 @@ api_endpoint = Blueprint('api_endpoint', __name__)
 @api_endpoint.after_request
 def add_header(response):
   # response.headers['Access-Control-Allow-Origin'] = '*'
-  # response.headers['Access-Control-Allow-Methods'] = '*'
-  # response.headers['Access-Control-Allow-Headers'] = '*'
+  response.headers['Access-Control-Allow-Methods'] = common_config.HTTP_HEADER_CONFIG.get('METHODS')
+  response.headers['Access-Control-Allow-Headers'] = common_config.HTTP_HEADER_CONFIG.get('HEADERS')
   response.headers['Access-Control-Allow-Origin'] = common_config.HTTP_HEADER_CONFIG.get('ORIGIN')
   response.headers['Content-Security-Policy'] = common_config.HTTP_HEADER_CONFIG.get('CSP')
   response.headers['X-Content-Type-Options'] = common_config.HTTP_HEADER_CONFIG.get('XCTPO')
