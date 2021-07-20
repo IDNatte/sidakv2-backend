@@ -151,8 +151,9 @@ def gre_verify(current_user):
     try:
       response = response.get_json()['gre_response']
       gre_key = current_app.config.get('RECAPTCHA_SECRET')
-      captcha_validate = 'https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}'.format(gre_key, response)
-      verifyCaptcha = r.post(captcha_validate)
+      data = {"response": response, "secret": gre_key}
+      captcha_validate = 'https://www.google.com/recaptcha/api/siteverify'
+      verifyCaptcha = r.post(captcha_validate, data)
 
       return jsonify(verifyCaptcha.text)
 
