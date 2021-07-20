@@ -154,7 +154,7 @@ def gre_verify(current_user):
       captcha_validate = 'https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}'.format(gre_key, response)
       verifyCaptcha = r.post(captcha_validate)
 
-      return jsonify(verifyCaptcha)
+      return jsonify(verifyCaptcha.text)
 
     except Exception as e:
       abort(403, {'BetaError': e})
