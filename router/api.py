@@ -148,10 +148,10 @@ def register(current_user):
 def gre_verify(current_user):
   if request.method == "POST":
     try:
-      response = response.get_json()['gre_response']
-      coba = recaptchaVerif(response)
+      response = request.form['g-recaptcha-response']
+      # coba = recaptchaVerif(response)
 
-      return jsonify(coba)
+      return jsonify({"test": response})
 
     except Exception as e:
       abort(403, {'BetaError': e})
