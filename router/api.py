@@ -148,7 +148,7 @@ def register(current_user):
 def gre_verify(current_user):
   if request.method == "POST":
     try:
-      response = request.form['g-recaptcha-response']
+      response = request.get_json()['gr_response']
       coba = recaptchaVerif(response)
 
       return jsonify({"test": coba})
