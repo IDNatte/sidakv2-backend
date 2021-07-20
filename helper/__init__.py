@@ -1,20 +1,19 @@
 """Helper class"""
 from flask import current_app, request, abort
+from crecatpcha.crecaptcha import crecaptcha
 from mongoengine import errors
 from functools import wraps
 from model import User
-import requests as r
 import jwt
 
 ALLOWED_EXTENSIONS = {'pdf'}
 ALLOWED_EXTENSIONS_IMG = {'jpg', 'png'}
 
 def recaptchaVerif(response):
-  gre_key = current_app.config.get('RECAPTCHA_SECRET')
-  data = {"response": response, "secret": gre_key}
-  captcha_validate = 'https://www.google.com/recaptcha/api/siteverify'
-  verifyCaptcha = r.post(captcha_validate, data)
-
+  # gre_key = current_app.config.get('RECAPTCHA_SECRET')
+  # data = {"response": response, "secret": gre_key}
+  # captcha_validate = 'https://www.google.com/recaptcha/api/siteverify'
+  verifyCaptcha = crecaptcha(gre_key, response)
   return verifyCaptcha.text
 
 def authentication(f):

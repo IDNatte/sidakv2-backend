@@ -149,9 +149,9 @@ def gre_verify(current_user):
   if request.method == "POST":
     try:
       response = request.form['g-recaptcha-response']
-      # coba = recaptchaVerif(response)
+      coba = recaptchaVerif(response)
 
-      return jsonify({"test": response})
+      return jsonify({"test": coba})
 
     except Exception as e:
       abort(403, {'BetaError': e})
