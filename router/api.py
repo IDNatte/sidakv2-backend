@@ -147,7 +147,7 @@ def register(current_user):
 @api_endpoint.route('/api/auth/recapatcha', method=["POST"])
 @authentication
 def gre_verify(current_user):
-  if request.method = "POST":
+  if request.method == "POST":
     try:
       response = response.get_json()['gre_response']
       gre_key = current_app.config.get('RECAPTCHA_SECRET')
