@@ -1,3 +1,22 @@
+## 1.1.2 (2021-07-20)
+
+### API Change
+- [API Change 1] Disabling organization change-able availability
+
+### Config Structure Change
+- [Config Structure Change 1] Restructuring ```common_config.py``` for ```HTTP_HEADER``` response
+
+
+### Data Model Change
+
+### Folder Structure Change
+
+### Library upgrade
+
+### Meta update
+
+----------------------------------------------------
+
 ## 1.1.2 (2021-07-18)
 
 ### API Change

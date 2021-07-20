@@ -167,17 +167,14 @@ def get_me(current_user):
       username = request.get_json()['username']
       password = request.get_json()['password']
       email = request.get_json()['email']
-      org = request.get_json()['org']
 
       user = User.objects(id=current_user.id).get()
       password_change = dbhelper.set_password(password)
-      org_change = Organization.objects(org_name__iexact=org).get()
 
       user.update(**{
         "username": username,
         "password": password_change,
-        "email": email,
-        "org": org_change.id
+        "email": email
       })
 
       return jsonify({"userUpdated": True})
