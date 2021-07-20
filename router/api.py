@@ -1,9 +1,8 @@
 from model import User, DynamicData, Organization, SectoralGroup, OrgDetail, OrgDetailBanner, dbhelper
 from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_directory
-from helper import authentication, allowed_file, allowed_file_img
+from helper import authentication, allowed_file, allowed_file_img, recaptchaVerif
 from config import common_config
 from werkzeug import utils
-import requests as r
 import mongoengine
 import platform
 import datetime
@@ -150,12 +149,9 @@ def gre_verify(current_user):
   if request.method == "POST":
     try:
       response = response.get_json()['gre_response']
-      gre_key = current_app.config.get('RECAPTCHA_SECRET')
-      data = {"response": response, "secret": gre_key}
-      captcha_validate = 'https://www.google.com/recaptcha/api/siteverify'
-      verifyCaptcha = r.post(captcha_validate, data)
+      coba = recaptchaVerif(response)
 
-      return jsonify(verifyCaptcha.text)
+      return jsonify(coba)
 
     except Exception as e:
       abort(403, {'BetaError': e})
