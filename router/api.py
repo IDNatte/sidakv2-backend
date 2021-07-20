@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_
 from helper import authentication, allowed_file, allowed_file_img
 from config import common_config
 from werkzeug import utils
-import request as r
+import requests as r
 import mongoengine
 import platform
 import datetime
