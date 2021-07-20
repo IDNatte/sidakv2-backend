@@ -146,7 +146,7 @@ def register(current_user):
 @api_endpoint.route('/api/auth/recaptcha', methods=["GET"])
 @authentication
 def gre_verify(current_user):
-  if request.method == "POST":
+  if request.method == "GET":
     try:
       response = request.get_json()['gr_response']
       coba = recaptchaVerif(response)
