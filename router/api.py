@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request, g, abort, current_app, send_from_
 from helper import authentication, allowed_file, allowed_file_img
 from config import common_config
 from werkzeug import utils
+import request as r
 import mongoengine
 import platform
 import datetime
@@ -142,6 +143,27 @@ def register(current_user):
 
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
+
+@api_endpoint.route('/api/auth/recapatcha', method=["POST"])
+@authentication
+def gre_verify(current_user):
+  if request.method = "POST":
+    try:
+      response = response.get_json()['gre_response']
+      gre_key = current_app.config.get('RECAPTCHA_SECRET')
+      captcha_validate = 'https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}'.format(gre_key, response)
+      verifyCaptcha = r.post(captcha_validate)
+
+      return jsonify(verifyCaptcha)
+
+    except Exception as e:
+      abort(403, {'BetaError': e})
+
+    except KeyError as e:
+      abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
+
+  else:
+    abort(405, {"MethodeNotAllowed": "Forbidden methode type"})
 
 # protected endpoint
 
