@@ -152,7 +152,7 @@ def get_me(current_user):
     return jsonify({
       "username" : str(current_user.username),
       "email": str(current_user.email),
-      "password": "*****",
+      "password": "protected",
       "org": current_user.org.org_name,
       "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
       "user_id": str(current_user.id),
