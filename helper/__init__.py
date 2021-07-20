@@ -14,7 +14,7 @@ def recaptchaVerif(response):
   # data = {"response": response, "secret": gre_key}
   # captcha_validate = 'https://www.google.com/recaptcha/api/siteverify'
   verifyCaptcha = crecaptcha(gre_key, response)
-  return verifyCaptcha.text
+  return verifyCaptcha
 
 def authentication(f):
   """Authentication helper"""
