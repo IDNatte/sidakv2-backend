@@ -154,7 +154,7 @@ def captcha_verify(current_user):
       return jsonify({"test": response})
 
     except Exception as e:
-      abort(403, {'BetaError': e})
+      abort(400, {'BetaError': e})
 
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
