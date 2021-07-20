@@ -153,7 +153,10 @@ def get_me(current_user):
       "username" : str(current_user.username),
       "email": str(current_user.email),
       "password": "protected",
-      "org": current_user.org.org_name,
+      "org": {
+        "id": str(current_user.org.id),
+        "org_name": current_user.org.org_name
+      },
       "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
       "user_id": str(current_user.id),
       "is_active": current_user.is_active
