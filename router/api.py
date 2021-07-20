@@ -143,7 +143,7 @@ def register(current_user):
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
 
-@api_endpoint.route('/api/auth/recaptcha', methods=["POST"])
+@api_endpoint.route('/api/auth/recaptcha', methods=["GET"])
 @authentication
 def gre_verify(current_user):
   if request.method == "POST":
