@@ -145,13 +145,13 @@ def register(current_user):
 
 @api_endpoint.route('/api/auth/recaptcha', methods=["GET"])
 @authentication
-def gre_verify(current_user):
+def captcha_verify(current_user):
   if request.method == "GET":
     try:
       response = request.get_json()['gr_response']
-      coba = recaptchaVerif(response)
+      # coba = recaptchaVerif(response)
 
-      return jsonify({"test": coba})
+      return jsonify({"test": response})
 
     except Exception as e:
       abort(403, {'BetaError': e})
