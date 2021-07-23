@@ -442,38 +442,42 @@ def org_list(current_user):
 @authentication
 def org_detail(current_user, org):
   if request.method == 'GET':
-    org_detail = OrgDetail.objects(org=org).get()
-    org_banner = OrgDetailBanner.objects(org_detail=org_detail.id)
+    try:
+      org_detail = OrgDetail.objects(org=org).get()
+      org_banner = OrgDetailBanner.objects(org_detail=org_detail.id)
 
-    banner = []
+      banner = []
 
-    for x in org_banner:
-      banner.append({
-        "id": str(x.id),
-        "banner": x.org_banner_name,
-        "url": x.org_banner_url,
-        "path": x.org_banner_path
-      })
+      for x in org_banner:
+        banner.append({
+          "id": str(x.id),
+          "banner": x.org_banner_name,
+          "url": x.org_banner_url,
+          "path": x.org_banner_path
+        })
 
-    org = {
-      "detail_id": str(org_detail.id),
-      "address": org_detail.org_address,
-      "email": org_detail.org_email,
-      "notif": org_detail.org_notification,
-      "phone": org_detail.org_phone,
-      "banner": banner,
-      "admin": {
-        "username": org_detail.creator.username,
-        "lvl": org_detail.creator.lvl,
-        "email": org_detail.creator.email
-      },
-      "org_info": {
-        "org_name": org_detail.org.org_name,
-        "org_sector": org_detail.org.sector_group.sector_name
+      org = {
+        "detail_id": str(org_detail.id),
+        "address": org_detail.org_address,
+        "email": org_detail.org_email,
+        "notif": org_detail.org_notification,
+        "phone": org_detail.org_phone,
+        "banner": banner,
+        "admin": {
+          "username": org_detail.creator.username,
+          "lvl": org_detail.creator.lvl,
+          "email": org_detail.creator.email
+        },
+        "org_info": {
+          "org_name": org_detail.org.org_name,
+          "org_sector": org_detail.org.sector_group.sector_name
+        }
       }
-    }
 
-    return jsonify(org)
+      return jsonify(org)
+
+    except mongoengine.errors.DoesNotExist as e:
+      return jsonify({})
       
   elif request.method == "POST":
     try:
