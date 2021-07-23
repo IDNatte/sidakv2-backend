@@ -142,10 +142,10 @@ def register(current_user):
   else:
     abort(400, {'MethodeError': 'Forbidden action'})
 
-@api_endpoint.route('/api/auth/recaptcha', methods=["GET"])
+@api_endpoint.route('/api/auth/recaptcha', methods=["POST"])
 @authentication
 def captcha_verify(current_user):
-  if request.method == "GET":
+  if request.method == "POST":
     try:
       response = request.get_json()['gr_response']
       verify = recaptchaVerif(response)
