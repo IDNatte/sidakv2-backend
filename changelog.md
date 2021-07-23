@@ -1,3 +1,22 @@
+## 1.1.2 (2021-07-23)
+
+### API Change
+- [API Change 1] Add G-Recaptcha endpoint verification
+
+### Config Structure Change
+- [Config Structure Change 1] Add ```RECAPTCHA_SECRET``` key to config @ ```flask.config.json```
+
+
+### Data Model Change
+
+### Folder Structure Change
+
+### Library upgrade
+
+### Meta update
+
+----------------------------------------------------
+
 ## 1.1.2 (2021-07-20)
 
 ### API Change

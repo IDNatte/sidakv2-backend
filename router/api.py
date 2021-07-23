@@ -14,7 +14,6 @@ api_endpoint = Blueprint('api_endpoint', __name__)
 
 @api_endpoint.after_request
 def add_header(response):
-  # response.headers['Access-Control-Allow-Origin'] = '*'
   response.headers['Access-Control-Allow-Methods'] = common_config.HTTP_HEADER_CONFIG.get('METHODS')
   response.headers['Access-Control-Allow-Headers'] = common_config.HTTP_HEADER_CONFIG.get('HEADERS')
   response.headers['Access-Control-Allow-Origin'] = common_config.HTTP_HEADER_CONFIG.get('ORIGIN')
@@ -149,12 +148,9 @@ def captcha_verify(current_user):
   if request.method == "GET":
     try:
       response = request.get_json()['gr_response']
-      # coba = recaptchaVerif(response)
+      verify = recaptchaVerif(response)
 
-      return jsonify({"test": response})
-
-    except Exception as e:
-      abort(400, {'BetaError': e})
+      return jsonify({"recaptchaResult": verify})
 
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
