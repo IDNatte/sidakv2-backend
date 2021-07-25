@@ -37,6 +37,8 @@ def before_request():
 @api_endpoint.app_errorhandler(403)
 @api_endpoint.app_errorhandler(404)
 @api_endpoint.app_errorhandler(405)
+@api_endpoint.app_errorhandler(406)
+@api_endpoint.app_errorhandler(410)
 @api_endpoint.app_errorhandler(500)
 @api_endpoint.app_errorhandler(501)
 def errorhandler(error):
@@ -490,6 +492,10 @@ def org_detail(current_user, org):
       org_info.save()
 
       return ({'created': True})
+
+    except mongoengine.errors.ValidationError as e:
+      print(e.to_dict())
+      abort(406, {'CharTooLong': 'Input Character is too long'})
         
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
@@ -514,14 +520,19 @@ def org_detail(current_user, org):
         "updated": True
       })
 
+    except mongoengine.errors.ValidationError as e:
+      abort(406, {'CharTooLong': 'Input character is too long'})
+
+    except mongoengine.errors.DoesNotExist as e:
+      abort(410, {'NoInitDataAvailable': 'No initial data acquired !'})
+
+
     except KeyError as e:
       abort(403, {'InvalidRequestBodyError': 'Argument {0} not found in body'.format(e)})
 
     except Exception as e:
       if e.code == 400:
         abort(403, {'InvalidRequestBodyError': 'None argument found in body'})
-      else:
-        abort(400, {'Error': e.description})
 
   elif request.method == "DELETE":
     try:
