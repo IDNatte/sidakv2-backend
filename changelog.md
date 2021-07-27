@@ -11,6 +11,23 @@
 ### Library upgrade
 
 ### Meta update
+- [Meta update 1] Enhancing response body @ ```/api/public/org```
+
+----------------------------------------------------
+
+## 1.1.2 (2021-07-25)
+
+### API Change
+
+### Config Structure Change
+
+### Data Model Change
+
+### Folder Structure Change
+
+### Library upgrade
+
+### Meta update
 - [Meta update 1] Enhancing error status for endpoint ```/api/org/info/<org>```
 
 ----------------------------------------------------

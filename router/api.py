@@ -1767,6 +1767,7 @@ def general_org():
             "phone": y.org_phone,
             "email": y.org_email,
             "notif": y.org_notification,
+            "address": y.org_address,
             "admin": {
               "username": y.creator.username,
               "email": y.creator.email,
@@ -1814,6 +1815,7 @@ def general_org():
             "phone": y.org_phone,
             "email": y.org_email,
             "notif": y.org_notification,
+            "address": y.org_address,
             "admin": {
               "username": y.creator.username,
               "email": y.creator.email,
@@ -1862,6 +1864,7 @@ def general_org():
             "phone": y.org_phone,
             "email": y.org_email,
             "notif": y.org_notification,
+            "address": y.org_address,
             "admin": {
               "username": y.creator.username,
               "email": y.creator.email,
@@ -1908,6 +1911,7 @@ def general_org():
             "phone": y.org_phone,
             "email": y.org_email,
             "notif": y.org_notification,
+            "address": y.org_address,
             "admin": {
               "username": y.creator.username,
               "email": y.creator.email,
@@ -1954,6 +1958,7 @@ def general_org():
           "phone": y.org_phone,
           "email": y.org_email,
           "notif": y.org_notification,
+          "address": y.org_address,
           "admin": {
             "username": y.creator.username,
             "email": y.creator.email,
@@ -2001,6 +2006,7 @@ def general_org():
         "phone": y.org_phone,
         "email": y.org_email,
         "notif": y.org_notification,
+        "address": y.org_address,
         "admin": {
           "username": y.creator.username,
           "email": y.creator.email,
