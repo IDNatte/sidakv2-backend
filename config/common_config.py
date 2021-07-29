@@ -5,7 +5,7 @@ HTTP_HEADER_CONFIG = {
 	"XFO": "SAMEORIGIN",
 	"XSSP": "1; mode=block",
 	"XPB": "Python",
-	"ORIGIN": "*",
+	"ORIGIN": "https://sidakdemo.tapinkab.go.id",
 	"METHODS": "GET, POST, PATCH, PUT, DELETE",
 	"HEADERS": "*"
 }

@@ -1,3 +1,20 @@
+## 1.1.2 (2021-07-30)
+
+### API Change
+
+### Config Structure Change
+
+### Data Model Change
+
+### Folder Structure Change
+
+### Library upgrade
+
+### Meta update
+- [Meta update 1] Set CORS origin to self
+
+----------------------------------------------------
+
 ## 1.1.2 (2021-07-25)
 
 ### API Change
