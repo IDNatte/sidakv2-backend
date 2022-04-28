@@ -18,6 +18,8 @@
 - [Meta update 4] refreshing requirements
 - [Meta update 5] add reset.txt for autorestarting apps in pushion passenger
 - [Meta update 6] remove init_admin.py
+- [Meta update 7] remove recaptcha
+- [Meta update 8] configuring index to autouse build
 
 ---
 
