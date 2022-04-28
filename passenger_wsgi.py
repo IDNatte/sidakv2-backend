@@ -1,6 +1,10 @@
 import sys, os
 
-INTERP = "~/sidak-sv/env/bin/python"
+workdir = os.path.dirname(os.getcwd())
+envdir = os.path.join(workdir, 'env/bin/python')
+
+
+INTERP = envdir
 if sys.executable != INTERP: os.execl(INTERP, INTERP, *sys.argv)
 
 
