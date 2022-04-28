@@ -16,6 +16,8 @@
 - [Meta update 2] reconfigure database
 - [Meta update 3] reconfigure CSRF Header
 - [Meta update 4] refreshing requirements
+- [Meta update 5] add reset.txt for autorestarting apps in pushion passenger
+- [Meta update 6] remove init_admin.py
 
 ---
 
