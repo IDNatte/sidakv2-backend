@@ -1,0 +1,20 @@
+{
+  "MONGODB_SETTINGS": {
+    "host": "mongodb://localhost/sisv_db",
+    "username": "",
+    "password": ""
+  },
+  "SECRET_KEY": "&#ZTJX$itKk=nPG&@RN(F;SvZJJLq2;29}3eF&)t%n/Yg-crFJyrZY.*3?=mj-YWxHQnQuZ$HQz2&nKf3#)qRdj[q)jD)jkPfS;6,4Kty)uPb7m8+eRP,Hw#)):_fh6Yq9WqFgq2f@zm$%:Req.euQ)VmkL(&meuFm5kxyjiKHHi#twzCwV6ne==mj7yyG*Wi:[R9&).",
+  "UPLOAD_FOLDER": "./public/upload",
+  "MAX_CONTENT_LENGTH": 20971520,
+  "RECAPTCHA_SECRET": "6LfkFawbAAAAAGo9pvsY0QzNhaYNRpqj1dlTZSvb",
+  "CSP": "default-src 'self'",
+  "VARY": "Origin",
+  "XCTPO": "nosniff",
+  "XFO": "SAMEORIGIN",
+  "XSSP": "1; mode=block",
+  "XPB": "Python",
+  "ORIGIN": "*",
+  "METHODS": "GET, POST, PATCH, PUT, DELETE",
+  "HEADERS": "*"
+}

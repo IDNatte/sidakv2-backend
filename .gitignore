@@ -22,4 +22,4 @@ snippet.txt
 testing.*
 
 public/upload/
-init.admin.py
+init_admin.py

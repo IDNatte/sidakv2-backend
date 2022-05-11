@@ -1,0 +1,48 @@
+* {
+  font-family: 'Quicksand', sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(243, 243, 243);
+  padding: 10px;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.cute-img {
+  width: 250px;
+}
+
+.cute-img svg {
+  width: 100%;
+  height: auto;
+  transition-duration: .3s;
+}
+
+.e-4xx svg:hover {
+  fill: rgb(162, 209, 197);
+}
+
+.e-5xx svg:hover {
+  fill: rgb(233, 166, 150)!important;
+}
+
+.underwork svg:hover {
+  fill: rgb(212, 184, 141)!important;
+}
+
+.error-msg,
+.underwork-msg {
+  padding: 30px 0px;
+  text-align: center;
+}
+
+.block-quotes {
+  background-color: rgb(145, 145, 145);
+  color: #e8e8e8;
+  padding: 2px;
+  border-radius: 2px;
+}
