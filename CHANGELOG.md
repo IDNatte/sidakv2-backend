@@ -69,7 +69,7 @@
 - [Meta update 2] Migrating from gitlab to github for convenience
 - [Meta update 3] Removing .vscode folder
 - [Meta update 4] Adding `pre-run.sh` & `pre-run.ps1`for pre-runner script to set FLASK_ENV & FLASK_APP
-- [Meta update 5] Renaming changelog.md to CHANGELOG according to github standarization
+- [Meta update 5] Renaming changelog.md to CHANGELOG.md according to github standarization
 
 
 ---
