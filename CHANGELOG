@@ -1,3 +1,35 @@
+## 1.1.3 (2022-13-05)
+
+### API Change
+
+### Config Structure Change
+
+- [Config Structure Change 1] Removing ENV key
+
+
+### Data Model Change
+
+### Folder Structure Change
+
+- [Folder Structure Change 1] Creating core folder
+- [Folder Structure Change 2] Creating script in core folder
+
+### Application Module & Function
+
+- [Application Module 1] Creating flask click command for populating data in sectoral & organization collection
+- [Application Module 2] Creating `fn() token_parser` for authentication bearer
+- [Application Module 3] Enabling admin account to not have data `organization`
+
+
+### Library upgrade
+
+### Meta update
+
+- [Meta update 1] Bump version 1.1.3
+
+
+---
+
 ## 1.1.3 (2022-12-05)
 
 ### API Change

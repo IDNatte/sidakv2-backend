@@ -1,9 +1,9 @@
-from cmath import inf
 from flask_mongoengine import MongoEngine
 from flask import Flask
 import json
 
 from app.controller.api import public_resource, protected_resource, auth, info
+from app.core.script import populate, admin
 from app.controller.web import web
 from app.shared import DB
 
@@ -14,6 +14,8 @@ def init_app(test_config=None):
 
     # initialize database
     DB.init_app(app)
+    populate.init_populator(app)
+    admin.init_admin(app)
 
     # API blueprint
     app.register_blueprint(info.api_endpoint)

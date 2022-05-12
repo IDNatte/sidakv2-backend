@@ -1,6 +1,8 @@
+"""Model class"""
+
 from app.helper.randomizer import random_public_id
+from datetime import datetime
 from app.shared import DB
-import datetime
 
 
 class SectoralGroup(DB.Document):
@@ -43,7 +45,7 @@ class OrgDetailBanner(DB.Document):
 
 class DynamicData(DB.DynamicDocument):
     public_id = DB.StringField(default=random_public_id)
-    created_on = DB.DateTimeField(default=datetime.datetime.now)
+    created_on = DB.DateTimeField(default=datetime.now)
     owner = DB.ReferenceField(User, reverse_delete_rule=DB.CASCADE)
     table_name = DB.StringField(required=True, unique=True)
     table_desc = DB.StringField(required=True)
@@ -55,3 +57,6 @@ class DynamicData(DB.DynamicDocument):
             }
         ]
     }
+
+
+# class

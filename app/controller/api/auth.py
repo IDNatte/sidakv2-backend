@@ -48,7 +48,7 @@ def authorization():
                         },
                         'exp': datetime.datetime.now() + datetime.timedelta(days=1),
                     }, current_app.config['SECRET_KEY'], algorithm='HS256')
-                    return jsonify({"access_token": token.decode('UTF-8'), "expired": token_exp})
+                    return jsonify({"access_token": token, "expired": token_exp})
                 else:
                     abort(401, {'authorizationError': 'Wrong password'})
             else:

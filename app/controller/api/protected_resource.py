@@ -41,8 +41,8 @@ def get_me(current_user):
             "email": str(current_user.email),
             "password": "protected",
             "org": {
-                "id": str(current_user.org.id),
-                "org_name": current_user.org.org_name
+                "id": str(current_user.org.id) if current_user.org is not None else '',
+                "org_name": current_user.org.org_name if current_user.org is not None else ''
             },
             "privilege": "admin" if int(current_user.lvl) == 1 else "cm_moderator",
             "user_id": str(current_user.id),
