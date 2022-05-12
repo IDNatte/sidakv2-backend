@@ -23,6 +23,8 @@
 
 ### Library upgrade
 
+- [Library upgrade 1] Reinstaling pyjwt
+
 ### Meta update
 
 - [Meta update 1] Bump version 1.1.3
