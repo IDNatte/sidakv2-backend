@@ -230,10 +230,10 @@ def sector_list(current_user):
 @authentication
 def org_list(current_user):
     if request.method == "GET":
-        web_query = request.get_json()
-        if web_query:
-            sector_query = web_query.get('sector_id')
-            org_query = web_query.get('org_name')
+        sector_query = request.args.get('sector_id')
+        org_query = request.args.get('sector_id')
+
+        if sector_query and org_query:
 
             try:
                 if sector_query and org_query:

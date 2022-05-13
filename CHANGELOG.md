@@ -19,7 +19,8 @@
 - [Application Module 1] Creating flask click command for populating data in sectoral & organization collection
 - [Application Module 2] Creating `fn() token_parser` for authentication bearer
 - [Application Module 3] Enabling admin account to not have data `organization`
-- [Application Module 3] Fixing GET to use args parameter instead @ endpoint `/api/sectoral`
+- [Application Module 4] Fixing GET to use args parameter instead @ endpoint `/api/sectoral`
+- [Application Module 5] Fixing GET to use args parameter instead @ endpoint `/api/org`
 
 
 ### Library upgrade
