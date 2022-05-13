@@ -186,11 +186,11 @@ def user_list(current_user):
 @authentication
 def sector_list(current_user):
     if request.method == "GET":
-        web_query = request.get_json()
-        if web_query:
-            sector_query = web_query.get('sector_name')
-            sector_list = SectoralGroup.objects(sector_name=sector_query).get()
-            return jsonify({"sector_id": sector_list.id, "sector_name": sector_list.sector_name})
+        sector_query = request.args.get('sector_name')
+        if sector_query:
+            sector_list = SectoralGroup.objects.filter(
+                sector_name=sector_query).get()
+            return jsonify({"sector_id": str(sector_list.id), "sector_name": sector_list.sector_name})
 
         else:
             carrier = []
