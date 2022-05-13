@@ -14,13 +14,13 @@ template_folder = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     'templates/')
 
-web_endpoint = Blueprint(
-    'web_endpoint', __name__,
+home_endpoint = Blueprint(
+    'home_endpoint', __name__,
     template_folder=template_folder,
     static_folder=static_folder)
 
 
-@web_endpoint.after_request
+@home_endpoint.after_request
 def add_header(response):
     response.headers['X-Powered-By'] = 'Python {0}'.format(
         platform.python_version())
@@ -28,16 +28,16 @@ def add_header(response):
     return response
 
 
-@web_endpoint.app_errorhandler(404)
+@home_endpoint.app_errorhandler(404)
 def error_4xx(error):
     return render_template('error/4xx.html', error=error), error.code
 
 
-@web_endpoint.app_errorhandler(500)
+@home_endpoint.app_errorhandler(500)
 def errorhandler(error):
     return render_template('error/5xx.html', error=error), error.code
 
 
-@web_endpoint.route('/')
+@home_endpoint.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('home/index.html')

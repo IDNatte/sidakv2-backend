@@ -4,7 +4,7 @@ import json
 
 from app.controller.api import public_resource, protected_resource, auth, info
 from app.core.script import populate, admin
-from app.controller.web import web
+from app.controller.web import home
 from app.shared import DB
 
 
@@ -24,7 +24,7 @@ def init_app(test_config=None):
     app.register_blueprint(protected_resource.api_endpoint)
 
     # Web service blueprint
-    app.register_blueprint(web.web_endpoint)
+    app.register_blueprint(home.home_endpoint)
 
     # testing
 
